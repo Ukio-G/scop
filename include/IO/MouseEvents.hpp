@@ -1,0 +1,11 @@
+#ifndef MOUSEEVENTS_HPP
+#define MOUSEEVENTS_HPP
+
+enum EMouseEvent {
+	EME_CLICK_LEFT,
+	EME_CLICK_RIGHT,
+	EME_SCROLL,
+	EME_MOVE
+};
+
+#endif //MOUSEEVENTS_HPP
