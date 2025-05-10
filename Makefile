@@ -1,6 +1,6 @@
-.PHONY: all
+.PHONY: all clean
 # miniRT compilation flags
-CFLAGS = # -Wextra -Wall -Werror
+CFLAGS = -std=c++17 #-Wextra -Wall -Werror
 INCLUDE = -I. -Imodules/GLWindow -Imodules/Resources -Iinclude -Iinclude/Graphic -Iinclude/IO -Iinclude/ModuleDispatcher
 
 LD_FLAGS += -L. -fPIC -rdynamic
@@ -44,3 +44,8 @@ $(addprefix $(OBJS_DIR)/,%.o): $(addprefix modules/Resources, $(notdir %.cpp)) $
 
 scop: $(OBJS)
 	$(CXX) $(CFLAGS) $(INCLUDE) $(OBJS) -o $@
+
+clean:
+	rm -rf $(OBJS_DIR)
+
+all: clean scop
