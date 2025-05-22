@@ -3,6 +3,8 @@
 
 #include <ostream>
 #include <cstddef>
+#include <optional>
+#include <vector>
 
 namespace glm42 {
     static constexpr double pi = 3.14159265;
@@ -259,10 +261,45 @@ namespace glm42 {
         os << " ]" << std::endl;
         return os;
     }
-
 }
 
+namespace geom {
+    struct Vertex {
+        glm42::vec3 pos;
+        glm42::vec3 uv;
+        glm42::vec3 normal;
+    };
 
+    struct Polygon {
+
+    };
+
+    struct Material {
+
+    };
+
+
+    struct Mesh {
+
+        // All polygons are in continuous list from 0 to (N - 1), where N - total polygons count
+        // So, we able to declare range from A to B as group and append
+        // Materials or something else especially to this group (qualifier "g" in .obj files)
+        struct Group {
+            std::string name;
+            std::optional<std::string> materialName;
+
+            size_t begin_idx;
+            size_t end_idx;
+
+            bool smooth;
+        };
+
+        std::vector<Polygon> polygons;
+        std::vector<Group> groups;
+        bool smooth;
+    };
+
+}
 
 
 

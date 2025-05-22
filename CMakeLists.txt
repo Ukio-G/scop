@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.11)
+cmake_minimum_required(VERSION 3.28)
 project(scop)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 #set(OpenGL_GL_PREFERENCE LEGACY)
 set(APP_TARGET scop)
 
@@ -38,6 +38,7 @@ add_executable(${APP_TARGET}
         modules/Resources/TextureKeeper.cpp
 
         modules/GLWindow/GLWindow.cpp
+        include/objLoader.hpp
 )
 
 

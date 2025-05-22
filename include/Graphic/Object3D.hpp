@@ -25,7 +25,7 @@ public:
 	}
 
 	virtual ~Object3D() {
-		
+
 	}
 
 	glm42::mat4 modelMatrix = glm42::mat4(1);
@@ -69,7 +69,7 @@ public:
 		return translateVector;
 	}
 
-	void setTranslate(const glm42::vec3 &translate) {
+	void setTranslate(const glm42::vec4 &translate) {
 		auto id = glm42::mat4::id();
 
 		translateVector = translate;
@@ -79,7 +79,7 @@ public:
 		return rotateVector;
 	}
 	
-	void setScale(const glm42::vec3 &scale) {
+	void setScale(const glm42::vec4 &scale) {
 		scaleVector = scale;
 		scaleMatrix = glm42::mat4(1);
 
@@ -91,7 +91,7 @@ public:
 		rotationMatrix = glm42::rotate(id, glm42::radians(deg), axis);
 	}
 
-	void setRotate(const glm42::vec3 &rotate) {
+	void setRotate(const glm42::vec4 &rotate) {
 		rotateVector = rotate;
 		auto id = glm42::mat4(1);
 
@@ -122,9 +122,9 @@ public:
 		return scaleMatrix;
 	}
 private:
-	glm42::vec4 rotateVector = glm42::vec3(0.0);
-	glm42::vec4 translateVector = glm42::vec3(0.0);
-	glm42::vec4 scaleVector = glm42::vec3(1.0);
+	glm42::vec4 rotateVector = glm42::vec4(0.0);
+	glm42::vec4 translateVector = glm42::vec4(0.0);
+	glm42::vec4 scaleVector = glm42::vec4(1.0);
 
 	glm42::mat4 rotationMatrix = glm42::mat4(1.0);
 	glm42::mat4 translateMatrix = glm42::mat4(1.0);

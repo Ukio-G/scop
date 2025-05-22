@@ -1,16 +1,17 @@
+#include "cfg_parser.hpp"
 #include "ModuleDispatcher/ModuleDispatcher.hpp"
 #include "modules/GLWindow/GLWindow.hpp"
 #include "modules/Resources/ResourcesModule.hpp"
 
 std::optional<config> readFromFile(const std::string & path) {
-    if (fileExist(path))
+    if (std::filesystem::exists(path))
         return config(path);
     return std::nullopt;
 }
 
 int main(int argc, char ** argv) {
 	if (argc != 2) {
-		std::cerr << "Reqiered configuration file as first argument: ./opengl-sample <relative path to config.json>" << std::endl;
+		std::cerr << "Required configuration file as first argument: ./opengl-sample <relative path to config.ini>" << std::endl;
 	}
 
 	ModuleDispatcher md;

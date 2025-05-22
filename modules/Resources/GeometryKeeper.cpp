@@ -3,12 +3,14 @@
 #include <stdexcept>
 #include <vector>
 #include "GeometryKeeper.hpp"
+
+#include "objLoader.hpp"
 #include "Vertex.hpp"
 #include "include/math.hpp"
 
 void GeometryKeeper::loadGeometryFromFile(const std::string & name, const std::string &objFilename) {
 	// Initialize Loader
-	objl::Loader Loader;
+	obj::Loader Loader;
 
 	// Load .obj File
 	bool loadout = Loader.LoadFile(objFilename);
@@ -42,7 +44,7 @@ void GeometryKeeper::loadGeometryFromFile(const std::string & name, const std::s
 
 
 		geometry[name] = {{VAO, VBO, EBO}, (Vertex*)vertex_data, (unsigned int*)indexes_data, Loader.LoadedVertices.size(), Loader.LoadedIndices.size()};
-		generateTBN(geometry[name]);
+		// generateTBN(geometry[name]);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_bytes, indexes_data, GL_STATIC_DRAW);
