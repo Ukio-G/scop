@@ -2,107 +2,164 @@
 #define OBJLOADER_HPP
 
 #include "math.hpp"
+#include <fstream>
+#include <map>
+#include <sstream>
 
 namespace obj {
-    enum RecordType : size_t {
-        Comment,
-        VertexPos,
-        VertexUV,
-        VertexNormal,
-        Face,
-        Material,
-        Smooth,
-        Group,
-        Object,
-        Undefined
-    };
+enum RecordType : size_t {
+  Comment,
+  VertexPos,
+  VertexUV,
+  VertexNormal,
+  Face,
+  Material,
+  Smooth,
+  Group,
+  Object,
+  Undefined
+};
 
-    class Loader {
-        bool LoadFile(const std::string & string);
+class Loader {
+public:
+  bool LoadFile(const std::string &string) {}
 
+  static inline size_t skip_spaces(const std::string & line, size_t pos = 0) {
+    while (line[pos] == ' ')
+      pos++;
+    return pos;
+  }
 
-        RecordType getLineType(const std::string & line) {
-            // Skip leading spaces
-            size_t pos = 0;
-            while (line[pos] == ' ')
-                pos++;
+  template <class T, size_t N>
+  static inline auto read_n_values(const std::string & line, size_t pos) -> std::array<T, N> {
+      std::array<T, N> result;
 
-            if (line[pos] == '#') return RecordType::Comment;
-            if (line[pos] == 'v') return RecordType::VertexPos;
-            if (line[pos] == 'v' && line[pos + 1] == 't') return RecordType::VertexUV;
-            if (line[pos] == 'v' && line[pos + 1] == 'n') return RecordType::VertexNormal;
-            if (line[pos] == 'f') return RecordType::Face;
-            if (line[pos] == 'm') return RecordType::Material;
-            if (line[pos] == 's') return RecordType::Smooth;
-            if (line[pos] == 'g') return RecordType::Group;
-            if (line[pos] == 'o') return RecordType::Object;
+      std::istringstream stream(line);
+      stream.ignore(static_cast<long>(pos));
 
-            return Undefined;
-        }
+      for (int i = 0; i < N; ++i) {
+        stream >> result[i];
+      }
 
+      if (stream.fail())
+        throw std::runtime_error("Fail to parse line: " + line);
+      return result;
+  }
 
-        template<size_t T>
-        void parseLine(const std::string & line);
+  RecordType getLineType(const std::string &line) {
+    // Skip leading spaces
+    size_t pos = skip_spaces(line);
 
+    if (line[pos] == '#')
+      return RecordType::Comment;
+    if (line[pos] == 'v')
+      return RecordType::VertexPos;
+    if (line[pos] == 'v' && line[pos + 1] == 't')
+      return RecordType::VertexUV;
+    if (line[pos] == 'v' && line[pos + 1] == 'n')
+      return RecordType::VertexNormal;
+    if (line[pos] == 'f')
+      return RecordType::Face;
+    if (line[pos] == 'm')
+      return RecordType::Material;
+    if (line[pos] == 's')
+      return RecordType::Smooth;
+    if (line[pos] == 'g')
+      return RecordType::Group;
+    if (line[pos] == 'o')
+      return RecordType::Object;
 
-        void parseVectorPos(const std::string & line) {
+    return Undefined;
+  }
 
-        }
+  template <size_t T> void parseLine(const std::string &line) {
+    size_t pos = skip_spaces(line);
 
-        void parseVectorUV(const std::string & line);
+  }
 
-        void parseVectorNormal(const std::string & line);
+  inline void parseVectorPos(const std::string &line) {
+    size_t pos = skip_spaces(line);
 
-        void parseFace(const std::string & line);
+  }
 
-        void parseMaterial(const std::string & line);
+  inline void parseVectorUV(const std::string &line) {
 
-        void parseSmooth(const std::string & line);
+  }
 
-        void parseType(const std::string & line);
+  inline void parseVectorNormal(const std::string &line) {
 
-        void parseObject(const std::string & line);
+  }
 
-        void LoadNextMesh(std::ifstream & file) {
+  inline void parseFace(const std::string &line) {
 
-            for (std::string line; std::getline(file, line);) {
+  }
 
-                RecordType type = getLineType(line);
-                if (type == RecordType::Comment)
-                    continue;
+  inline void parseMaterial(const std::string &line) {
 
-                if (type == RecordType::Undefined)
-                    throw std::runtime_error("Undefined record while parsing OBJ file");
+  }
 
-                switch (type) {
-                    case RecordType::VertexPos: parseVectorPos(line); break;
-                    case RecordType::VertexUV: parseVectorUV(line); break;
-                    case RecordType::VertexNormal: parseVectorNormal(line); break;
-                    case RecordType::Face: parseFace(line); break;
-                    case RecordType::Material: parseMaterial(line); break;
-                    case RecordType::Smooth: parseSmooth(line); break;
-                    case RecordType::Group: parseType(line); break;
-                    case RecordType::Object: parseObject(line); break;
-                }
+  inline void parseSmooth(const std::string &line) {
 
-            }
-        }
+  }
 
+  inline void parseType(const std::string &line) {
 
+  }
 
-    public:
-        std::vector<geom::Mesh> meshes;
-        std::vector<geom::Vertex> vertices;
+  inline void parseObject(const std::string &line) {
 
-    private:
-        std::vector<glm42::vec3> positions;
-        std::vector<glm42::vec3> normals;
-        std::vector<glm42::vec2> texcoords;
+  }
 
+  void LoadNextMesh(std::ifstream &file) {
 
-    };
+    for (std::string line; std::getline(file, line);) {
 
-}
+      RecordType type = getLineType(line);
+      if (type == RecordType::Comment)
+        continue;
 
+      if (type == RecordType::Undefined)
+        throw std::runtime_error("Undefined record while parsing OBJ file");
 
-#endif //OBJLOADER_HPP
+      switch (type) {
+      case RecordType::VertexPos:
+        parseVectorPos(line);
+        break;
+      case RecordType::VertexUV:
+        parseVectorUV(line);
+        break;
+      case RecordType::VertexNormal:
+        parseVectorNormal(line);
+        break;
+      case RecordType::Face:
+        parseFace(line);
+        break;
+      case RecordType::Material:
+        parseMaterial(line);
+        break;
+      case RecordType::Smooth:
+        parseSmooth(line);
+        break;
+      case RecordType::Group:
+        parseType(line);
+        break;
+      case RecordType::Object:
+        parseObject(line);
+        break;
+      }
+    }
+  }
+
+public:
+  std::vector<geom::Mesh> meshes;
+  std::vector<geom::Vertex> vertices;
+
+private:
+  std::vector<glm42::vec3> positions;
+  std::vector<glm42::vec3> normals;
+  std::vector<glm42::vec2> texcoords;
+};
+
+} // namespace obj
+
+#endif // OBJLOADER_HPP

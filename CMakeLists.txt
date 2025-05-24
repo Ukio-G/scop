@@ -41,6 +41,13 @@ add_executable(${APP_TARGET}
         include/objLoader.hpp
 )
 
+add_executable(
+        objload_tests
+
+        include/objLoader.hpp
+        src/objloader_test.cpp
+)
+
 
 target_link_libraries(${APP_TARGET} ${GLEW_LIBRARIES} dl)
 
