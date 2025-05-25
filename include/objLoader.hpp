@@ -2,9 +2,11 @@
 #define OBJLOADER_HPP
 
 #include "math.hpp"
+#include <array>
 #include <fstream>
 #include <map>
 #include <sstream>
+#include <unordered_map>
 
 namespace obj {
 enum RecordType : size_t {
@@ -79,15 +81,20 @@ public:
 
   inline void parseVectorPos(const std::string &line) {
     size_t pos = skip_spaces(line);
-
+    auto result = read_n_values<double, 3>(line, pos + 1);
+    positions.emplace_back(result[0], result[1], result[2]);
   }
 
   inline void parseVectorUV(const std::string &line) {
-
+        size_t pos = skip_spaces(line);
+        auto result = read_n_values<double, 2>(line, pos + 2);
+        texcoords.emplace_back(result[0], result[1]);
   }
 
   inline void parseVectorNormal(const std::string &line) {
-
+        size_t pos = skip_spaces(line);
+        auto result = read_n_values<double, 3>(line, pos + 2);
+        normals.emplace_back(result[0], result[1], result[2]);
   }
 
   inline void parseFace(const std::string &line) {
@@ -102,7 +109,7 @@ public:
 
   }
 
-  inline void parseType(const std::string &line) {
+  inline void parseGroup(const std::string &line) {
 
   }
 
@@ -141,7 +148,7 @@ public:
         parseSmooth(line);
         break;
       case RecordType::Group:
-        parseType(line);
+        parseGroup(line);
         break;
       case RecordType::Object:
         parseObject(line);
@@ -151,13 +158,18 @@ public:
   }
 
 public:
-  std::vector<geom::Mesh> meshes;
-  std::vector<geom::Vertex> vertices;
+  std::unordered_map<std::string, geom::Mesh> meshes;
+
 
 private:
+  std::string currentMesh;
+
+  // Cache for one mesh (Then object parsing finished compile all of this to polygons)
   std::vector<glm42::vec3> positions;
   std::vector<glm42::vec3> normals;
   std::vector<glm42::vec2> texcoords;
+
+  
 };
 
 } // namespace obj
