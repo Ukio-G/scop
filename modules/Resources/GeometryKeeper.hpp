@@ -23,12 +23,6 @@ using Ptr = std::shared_ptr<GeometryKeeper>;
 	std::unordered_map<std::string, Geometry> geometry;
 
 	void loadGeometryFromFile(const std::string & name, const std::string & objFilename);
-	void newGeometry(const std::string &name, const Vertex *vertexData, const int *indexes, size_t vertexes_count,
-					size_t indexes_count);
-	void newGeometry(const std::string &name, const std::vector<Vertex> &data, const std::vector<int> &indexes);
-
-	void newLineGeometry(const std::string & name, const glm42::vec3 & start ,const glm42::vec3 & end);
-	void newLineStripGeometry(const std::string & name, const std::vector<glm42::vec3> & points);
 
 	template<typename T>
 	T instance(const std::string & name) {
@@ -40,8 +34,8 @@ using Ptr = std::shared_ptr<GeometryKeeper>;
 	}
 
 private:
-	std::unordered_map<std::string, std::vector<Vertex> > vertexData;
-	std::unordered_map<std::string, std::vector<unsigned int> > indexesData;
+	std::unordered_map<std::string, std::vector<geom::Vertex> > vertexData;
+	std::unordered_map<std::string, std::vector<size_t> > indexesData;
 };
 
 

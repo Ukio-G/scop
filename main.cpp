@@ -1,42 +1,26 @@
+#include "IO/Window.hpp"
 #include "cfg_parser.hpp"
-#include "ModuleDispatcher/ModuleDispatcher.hpp"
-#include "modules/GLWindow/GLWindow.hpp"
-#include "modules/Resources/ResourcesModule.hpp"
+#include "modules/Resources/TexturesKeeper.hpp"
 
-std::optional<config> readFromFile(const std::string & path) {
-    if (std::filesystem::exists(path))
-        return config(path);
-    return std::nullopt;
-}
+int main(int argc, char **argv) {
+  Window w(800, 600);
 
-int main(int argc, char ** argv) {
-	if (argc != 2) {
-		std::cerr << "Required configuration file as first argument: ./opengl-sample <relative path to config.ini>" << std::endl;
-	}
+  GeometryKeeper g_keeper;
+  TexturesKeeper t_keeper;
 
-	ModuleDispatcher md;
-	md.registerModuleInfo(GLWindowModule::ModuleInfo());
-	md.registerModuleInfo(ResourcesModule::ModuleInfo());
+  config cfg(argv[1]);
 
-	//md.loadConfigurations(argv[1]);
+  auto model = cfg["model"];
+  auto name = std::get<std::string>(model["name"]);
+  auto file_path = std::get<std::string>(model["file_path"]);
+  g_keeper.loadGeometryFromFile(name, file_path);
 
-	md.instanceModulesFromConfig();
-	std::cout << "Modules instanced" << std::endl;
+  Object3D obj;
+  obj.geometry = g_keeper.geometry[name];
+  obj.name = name;
 
-	md.initModulesEvents();
-	std::cout << "Events inited" << std::endl;
+  w.addObject3DToDraw(&obj);
+  w.drawLoop();
 
-	md.pushConfigToModules();
-
-	md.configureModules();
-	std::cout << "Modules configured" << std::endl;
-
-	md.initModules();
-	std::cout << "Modules initialized" << std::endl;
-
-	md.startModules();
-
-	md.execLoop();
-
-	return 0;
+  return 0;
 }

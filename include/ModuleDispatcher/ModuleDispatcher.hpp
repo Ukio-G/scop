@@ -20,8 +20,6 @@
 
 #include <dlfcn.h>
 
-#include "json.hpp"
-
 
 class ModuleDispatcher
 {
@@ -108,16 +106,9 @@ public:
     }
 
 	void loadConfigurations(const std::string & filename) {
-		nlohmann::json j;
-		std::ifstream ifs(filename);
-		if (ifs.fail()){
-			throw std::runtime_error("Configuration file " + filename + " not found");
-    	}
-
-		j = nlohmann::json::parse(ifs);
-
-		modulesConfiguration = j["modulesConfiguration"];
-		modulesToStart = j["modulesToStart"];
+            config cfg(filename);
+		modulesConfiguration = cfg["modulesConfiguration"];
+		modulesToStart = cfg["modulesToStart"];
 	}
 
 	void instanceModulesFromConfig() {
@@ -222,8 +213,8 @@ private:
 
 	int idCounter = 0;
 
-	nlohmann::json modulesConfiguration;
-	nlohmann::json modulesToStart;
+	std::map<std::string, std::string> modulesConfiguration;
+	std::vector<std::string> modulesToStart;
 
 	std::mutex m;
 	std::condition_variable cv;

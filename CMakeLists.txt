@@ -34,10 +34,8 @@ add_executable(${APP_TARGET}
         src/Orbit.cpp
 
         modules/Resources/GeometryKeeper.cpp
-        modules/Resources/ResourcesModule.cpp
         modules/Resources/TextureKeeper.cpp
 
-        modules/GLWindow/GLWindow.cpp
         include/objLoader.hpp
 )
 

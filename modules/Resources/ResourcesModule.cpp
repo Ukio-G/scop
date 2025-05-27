@@ -33,64 +33,12 @@ void ResourcesModule::init() {
     geometryKeeper = std::make_shared<GeometryKeeper>();
     textureKeeper = std::make_shared<TexturesKeeper>();
 
-    std::string basedir = config["resourcesDir"];
-    std::string objectsJSON = basedir + static_cast<std::string>(config["objectsConfiguration"]);
+    std::string basedir = cfg["resourcesDir"];
+    std::string objectsJSON = basedir + static_cast<std::string>(cfg["objectsConfiguration"]);
 
-    std::string modelsDir = basedir + static_cast<std::string>(config["modelsDir"]);
-    std::string texturesDir = basedir + static_cast<std::string>(config["texturesDir"]);
+    std::string modelsDir = basedir + static_cast<std::string>(cfg["modelsDir"]);
+    std::string texturesDir = basedir + static_cast<std::string>(cfg["texturesDir"]);
 
-    nlohmann::json objectsConfiguration;
-    std::ifstream ifs(objectsJSON);
-    if (ifs.fail()){
-        throw std::runtime_error("[ResourcesModule] JSON file " + objectsJSON + " not found");
-    }
-
-    objectsConfiguration = nlohmann::json::parse(ifs);
-
-    for (auto & object : objectsConfiguration) {
-        DescriptionObject3D descriptionObject = object;
-
-        std::cout << descriptionObject;
-
-        geometryKeeper->loadGeometryFromFile(descriptionObject.modelPath, basedir + descriptionObject.modelPath);
-        textureKeeper->loadTexturesFromFile(descriptionObject, basedir);
-        
-        // Possible leak if object already exist
-        if (objects3D.find(descriptionObject.name) != objects3D.end()) {
-            delete objects3D[descriptionObject.name];
-        }
-
-        objects3D[descriptionObject.name] = new Object3D(geometryKeeper->geometry[descriptionObject.modelPath]);
-        objects3D[descriptionObject.name]->textures = &(textureKeeper->textures[descriptionObject.name]);
-
-        if (descriptionObject.translate)
-            objects3D[descriptionObject.name]->setTranslate(*descriptionObject.translate);
-
-        if (descriptionObject.rotate)
-            objects3D[descriptionObject.name]->setRotate(*descriptionObject.rotate);
-
-        if (descriptionObject.scale)
-            objects3D[descriptionObject.name]->setScale(*descriptionObject.scale);
-        
-        objects3D[descriptionObject.name]->updateModelMatrix();
-        
-        pushObject3D(objects3D[descriptionObject.name]);
-    }
-
-    geometryKeeper->newLineGeometry("Line", {0.0, -15.0, 0.0}, {0.0, 15.0, 0.0});
-    geometryKeeper->newLineStripGeometry("Orbit", genCircle(100));
-
-    Line l = geometryKeeper->instance<Line>("Line");
-    LineStrip ls = geometryKeeper->instance<LineStrip>("Orbit");
-
-    auto moon_it = objects3D.find("Moon");
-    if (moon_it != objects3D.end()) {
-        orbit = std::make_shared<Orbit>(moon_it->second);
-        orbit->axis = l;
-        orbit->orbit = ls;
-    }
-    else
-        std::cout << "WARNING! Moon not found." << std::endl;
 
     inited = true;
 }
@@ -100,8 +48,7 @@ void ResourcesModule::initEvents() {
         return;
 
     subscriber->addActionToTopic(getConfigurationEventName(), [this](std::any data){
-        std::cout << "["<< name << "] config received" << std::endl;
-        config = std::any_cast<nlohmann::json>(data);
+        std::cout << "["<< name << "] cfg received" << std::endl;
     });
 
     subscriber->addActionToTopic("getOrbit", [this](std::any data) {

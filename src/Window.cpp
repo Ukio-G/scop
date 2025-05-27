@@ -78,24 +78,16 @@ void Window::draw3DObjects() {
 	}
 }
 
-void Window::drawInterface() {
-	ui->draw();
-}
-
 void Window::drawLoop() {
 	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwMakeContextCurrent(glfwWindow);
 
-	ui = new UI();
-	ui->init(glfwWindow);
-	
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	projectionMatrix = glm42::perspective(45.0f, 800.f/800.f, 0.001f, 1000.0f);
 	while (!glfwWindowShouldClose(glfwWindow)) {
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
-		drawInterface();
 
 		keysControls->pollingKeysEvent();
 		mouseControls->pollingMouseEvents();
@@ -106,10 +98,6 @@ void Window::drawLoop() {
 		draw3DObjects();
 		passUniforms();
 
-		if (ui->orbit)
-			ui->orbit->draw(*lineShader);
-
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 		glfwSwapBuffers(glfwWindow);
 	}
 
@@ -123,11 +111,6 @@ void Window::initShaders() {
 	Shader vs("../resources/shaders/vs.glsl", GL_VERTEX_SHADER);
 	Shader fs("../resources/shaders/fs.glsl", GL_FRAGMENT_SHADER);
 	shaderProgram = new ShaderProgram(&vs, &fs);
-
-
-	Shader line_vs("../resources/shaders/line_vs.glsl", GL_VERTEX_SHADER);
-	Shader line_fs("../resources/shaders/line_fs.glsl", GL_FRAGMENT_SHADER);
-	lineShader = new ShaderProgram(&line_vs, &line_fs);
 }
 
 Window::~Window() {
@@ -160,7 +143,6 @@ void Window::init() {
 	initGLEW();
 
 	initViewport();
-	initUI();
 	initShaders();
 	initIO();
 }

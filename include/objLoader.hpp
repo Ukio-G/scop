@@ -2,8 +2,10 @@
 #define OBJLOADER_HPP
 
 #include "math.hpp"
+#include <algorithm>
 #include <array>
 #include <fstream>
+#include <iostream>
 #include <map>
 #include <sstream>
 #include <unordered_map>
@@ -16,15 +18,21 @@ enum RecordType : size_t {
   VertexNormal,
   Face,
   Material,
+  MaterialLib,
   Smooth,
   Group,
   Object,
+  EmptyLine,
   Undefined
 };
 
 class Loader {
 public:
-  bool LoadFile(const std::string &string) {}
+  void LoadFile(const std::string &string) {
+    std::ifstream file(string);
+
+    LoadNextMesh(file);
+  }
 
   static inline size_t skip_spaces(const std::string & line, size_t pos = 0) {
     while (line[pos] == ' ')
@@ -48,6 +56,16 @@ public:
       return result;
   }
 
+  inline std::vector<size_t> fanTriangulate(auto & face_indices) {
+    std::vector<size_t> result;
+    for (size_t i = 1; i + 1 < face_indices.size(); ++i) {
+      result.push_back(face_indices[0]);
+      result.push_back(face_indices[i]);
+      result.push_back(face_indices[i + 1]);
+    }
+    return result;
+  }
+
   RecordType getLineType(const std::string &line) {
     // Skip leading spaces
     size_t pos = skip_spaces(line);
@@ -62,7 +80,9 @@ public:
       return RecordType::VertexNormal;
     if (line[pos] == 'f')
       return RecordType::Face;
-    if (line[pos] == 'm')
+    if (line[pos] == 'm' && line.find("mtllib") != std::string::npos)
+      return RecordType::MaterialLib;
+    if (line[pos] == 'u' && line.find("usemtl") != std::string::npos)
       return RecordType::Material;
     if (line[pos] == 's')
       return RecordType::Smooth;
@@ -70,13 +90,63 @@ public:
       return RecordType::Group;
     if (line[pos] == 'o')
       return RecordType::Object;
+    if (line[pos] == '\0')
+      return RecordType::EmptyLine;
 
     return Undefined;
   }
 
-  template <size_t T> void parseLine(const std::string &line) {
-    size_t pos = skip_spaces(line);
+  inline size_t insertVertexOrGetIndex(const geom::Vertex& vtx) {
+    auto & vtxes = meshes[currentMesh].vertexes;
+    auto it = std::find(vtxes.begin(), vtxes.end(), vtx);
 
+    if (it != vtxes.end()) {
+      return std::distance(vtxes.begin(), it);
+    }
+
+    // Need to insert
+    vtxes.push_back(vtx);
+    return vtxes.size() - 1;
+  }
+
+  inline geom::Vertex fromFaceFragment(const std::string & objFaceFragment) {
+    auto first_delim = objFaceFragment.find('/');
+    auto second_delim = objFaceFragment.find('/', first_delim + 1);
+    geom::Vertex result;
+
+    // v
+    if ((first_delim == std::string::npos) && (second_delim == std::string::npos))
+    {
+      result.pos = positions[std::stoi(objFaceFragment) - 1];
+    }
+
+    // v/vt
+    if ((first_delim != std::string::npos) && (second_delim == std::string::npos))
+    {
+      auto pos_str = objFaceFragment.substr(0, first_delim - 1);
+      auto uv_str = objFaceFragment.substr(first_delim + 1, objFaceFragment.size() - 1);
+      result.pos = positions[std::stoi(pos_str) - 1];
+      result.uv = texcoords[std::stoi(uv_str) - 1];
+    }
+
+    if ((first_delim != std::string::npos) && (second_delim != std::string::npos))
+    {
+      // v//vn (general case)
+      auto pos_str = objFaceFragment.substr(0, first_delim - 1);
+      auto normal_str = objFaceFragment.substr(second_delim + 1, objFaceFragment.size() - 1);
+      result.pos = positions[std::stoi(pos_str) - 1];
+      result.normal = normals[std::stoi(normal_str) - 1];
+
+      // v/vt/vn
+      if ((first_delim + 1) != (second_delim))
+      {
+        auto uv_str = objFaceFragment.substr(first_delim + 1, second_delim - 1);
+        result.uv = texcoords[std::stoi(uv_str) - 1];
+      }
+    }
+
+
+    return result;
   }
 
   inline void parseVectorPos(const std::string &line) {
@@ -98,7 +168,26 @@ public:
   }
 
   inline void parseFace(const std::string &line) {
+    std::istringstream ss(line);
+    std::string token;
+    std::vector<size_t> indexes;
 
+    ss >> token;
+
+    while (ss >> token) {
+      auto vtx = fromFaceFragment(token);
+      auto idx = insertVertexOrGetIndex(vtx);
+      indexes.push_back(idx);
+    }
+
+    auto & mesh_indexes = meshes[currentMesh].indexes;
+    // Fan sub-triangulate
+    if (indexes.size() > 3) {
+      auto fan_triangulated_indexes = fanTriangulate(indexes);
+      mesh_indexes.insert(mesh_indexes.end(), fan_triangulated_indexes.begin(), fan_triangulated_indexes.end());
+    } else {
+      mesh_indexes.insert(mesh_indexes.end(), indexes.begin(), indexes.end());
+    }
   }
 
   inline void parseMaterial(const std::string &line) {
@@ -110,11 +199,19 @@ public:
   }
 
   inline void parseGroup(const std::string &line) {
-
+    throw std::runtime_error("Not supported yet");
   }
 
   inline void parseObject(const std::string &line) {
+    std::istringstream ss(line);
+    std::string token;
 
+    ss >> token;
+    ss >> token;
+
+    std::cout << "Parse object: " << token << std::endl;
+
+    currentMesh = token;
   }
 
   void LoadNextMesh(std::ifstream &file) {
@@ -157,19 +254,37 @@ public:
     }
   }
 
+  void printDebug() {
+
+    for (auto &[name, mesh] : meshes) {
+        std::cout << "Mesh: " << name << std::endl;
+
+        std::cout << "Vertexes count:" << mesh.vertexes.size() << std::endl;
+        std::cout << "Indexes count:" << mesh.indexes.size() << std::endl;
+
+
+        std::cout << "Vertexes: " << std::endl;
+        for (auto & vtx : mesh.vertexes)
+          std::cout << vtx << std::endl;
+
+        std::cout << "Indexes: " << std::endl;
+        for (int i = 0; i < mesh.indexes.size(); i+=3)
+          std::cout << "( " << mesh.indexes[i] << ", " << mesh.indexes[i + 1]  << ", " << mesh.indexes[i + 2]  <<  " )" << std::endl;
+
+    }
+  }
+
 public:
   std::unordered_map<std::string, geom::Mesh> meshes;
 
 
 private:
-  std::string currentMesh;
+  std::string currentMesh = "default";
 
   // Cache for one mesh (Then object parsing finished compile all of this to polygons)
   std::vector<glm42::vec3> positions;
   std::vector<glm42::vec3> normals;
   std::vector<glm42::vec2> texcoords;
-
-  
 };
 
 } // namespace obj

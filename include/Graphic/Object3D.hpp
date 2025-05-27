@@ -51,16 +51,16 @@ public:
 		bindToDraw();
 		shaderProgram.use();
 		shaderProgram.setMatrix4d("transform", modelMatrix);
-		shaderProgram.setBool("normalMapUsage", textures->normal());
-		if (textures->normal())
-			shaderProgram.setInt("normalMap", ETT_NORMAL);
+ //		shaderProgram.setBool("normalMapUsage", textures->normal());
+//		if (textures->normal())
+//			shaderProgram.setInt("normalMap", ETT_NORMAL);
 	}
 
 	void bindToDraw() {
 		if (textures) {
 			textures->diffuse()->bind();
-			if (auto normal = textures->normal())
-				normal->bind(ETT_NORMAL);
+//			if (auto normal = textures->normal())
+//				normal->bind(ETT_NORMAL);
 		}
 		glBindVertexArray(geometry.buffers.VAO);
 	}

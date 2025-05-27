@@ -14,8 +14,6 @@
 // GLFW
 #include <GLFW/glfw3.h>
 
-#include "IO/UI.hpp"
-
 #include "WindowSettings.hpp"
 
 #include <string>
@@ -59,7 +57,6 @@ private:
 	ShaderProgram* lineShader;
 	KeysControls* keysControls;
 	MouseControls* mouseControls;
-	UI* ui;
 	Camera* camera;
 	std::thread* renderThr;
 	int width;

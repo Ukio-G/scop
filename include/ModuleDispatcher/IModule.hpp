@@ -3,11 +3,11 @@
 
 #include "EventChannel.hpp"
 #include "ModuleInfo.hpp"
-#include "json.hpp"
+#include "cfg_parser.hpp"
 #include <chrono>
+#include <future>
 #include <string>
 #include <thread>
-#include <future>
 
 class ModuleDispatcher;
 
@@ -82,8 +82,8 @@ public:
 	}
 
 	void waitConfigurationReceived() {
-		while (config.empty()) {
-			std::cout << "Wait config" << std::endl;
+		while (cfg.empty()) {
+			std::cout << "Wait cfg" << std::endl;
 			std::this_thread::sleep_for(std::chrono::milliseconds(50));
 		}
 	}
@@ -111,7 +111,7 @@ protected:
 
 	ModuleDispatcher * owner;
 	std::string name;
-	nlohmann::json config;
+	config cfg;
 	EModuleStatus status = EMS_UNDEFINED;
 
 	// Used for one-time initialization
