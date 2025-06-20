@@ -9,6 +9,7 @@
 #include <map>
 #include <sstream>
 #include <unordered_map>
+#include <filesystem>
 
 namespace obj {
 enum RecordType : size_t {
@@ -29,7 +30,12 @@ enum RecordType : size_t {
 class Loader {
 public:
   void LoadFile(const std::string &string) {
+    namespace fs = std::filesystem;
+
     std::ifstream file(string);
+    fs::path p(string);
+
+    currentMesh = p.stem();
 
     LoadNextMesh(file);
   }
@@ -72,12 +78,12 @@ public:
 
     if (line[pos] == '#')
       return RecordType::Comment;
-    if (line[pos] == 'v')
-      return RecordType::VertexPos;
     if (line[pos] == 'v' && line[pos + 1] == 't')
       return RecordType::VertexUV;
     if (line[pos] == 'v' && line[pos + 1] == 'n')
       return RecordType::VertexNormal;
+    if (line[pos] == 'v')
+      return RecordType::VertexPos;
     if (line[pos] == 'f')
       return RecordType::Face;
     if (line[pos] == 'm' && line.find("mtllib") != std::string::npos)
@@ -123,8 +129,8 @@ public:
     // v/vt
     if ((first_delim != std::string::npos) && (second_delim == std::string::npos))
     {
-      auto pos_str = objFaceFragment.substr(0, first_delim - 1);
-      auto uv_str = objFaceFragment.substr(first_delim + 1, objFaceFragment.size() - 1);
+      auto pos_str = objFaceFragment.substr(0, first_delim);
+      auto uv_str = objFaceFragment.substr(first_delim, objFaceFragment.size() - 1);
       result.pos = positions[std::stoi(pos_str) - 1];
       result.uv = texcoords[std::stoi(uv_str) - 1];
     }
@@ -132,7 +138,7 @@ public:
     if ((first_delim != std::string::npos) && (second_delim != std::string::npos))
     {
       // v//vn (general case)
-      auto pos_str = objFaceFragment.substr(0, first_delim - 1);
+      auto pos_str = objFaceFragment.substr(0, first_delim);
       auto normal_str = objFaceFragment.substr(second_delim + 1, objFaceFragment.size() - 1);
       result.pos = positions[std::stoi(pos_str) - 1];
       result.normal = normals[std::stoi(normal_str) - 1];

@@ -1,74 +1,92 @@
+#include "GeometryKeeper.hpp"
 #include <GL/glew.h>
 #include <cstring>
 #include <stdexcept>
 #include <vector>
-#include "GeometryKeeper.hpp"
 
-#include "objLoader.hpp"
 #include "Vertex.hpp"
 #include "include/math.hpp"
+#include "objLoader.hpp"
+#pragma pack(1)
 
-void GeometryKeeper::loadGeometryFromFile(const std::string & name, const std::string &objFilename) {
-	// Initialize Loader
-	obj::Loader Loader;
+void GeometryKeeper::loadGeometryFromFile(const std::string &name,
+                                          const std::string &objFilename) {
+  bool use_own_loader = false;
+  // Initialize Loader
+  obj::Loader Loader;
 
-	// Load .obj File
-	Loader.LoadFile(objFilename);
+  // Load .obj File
+  Loader.LoadFile(objFilename);
 
-        auto& mesh = Loader.meshes.at(name);
-        // Copy data (Very bad, yea, need own obj parser)
-        size_t vertexes_bytes = mesh.vertexes.size() * sizeof(geom::Vertex);
-        size_t indexes_bytes = mesh.indexes.size() * sizeof(size_t);
+  auto &mesh = Loader.meshes.at(name);
 
-        // Am I really need this copy?
-        vertexData[name] = mesh.vertexes;
-        indexesData[name] = mesh.indexes;
+  // Am I really need this copy?
+  vertexData[name] = mesh.vertexes;
+  indexesData[name] = mesh.indexes;
 
-        void* vertex_data = vertexData[name].data();
-        void* indexes_data = indexesData[name].data();
+  // Randomize colors
+  int i = 0;
+  for (auto &vtx : vertexData[name]) {
+    vtx.color[0] = 1.0f / static_cast<float>(1 + (i++) % 5);
+    vtx.color[1] = 1.0f / static_cast<float>(1 + (i++) % 5);
+    vtx.color[2] = 1.0f / static_cast<float>(1 + (i++) % 5);
+  }
 
-        // Generate Vertex Array Object
-        unsigned int VAO;
+  unsigned int vertex_size = sizeof(geom::Vertex);
+  size_t vertexes_bytes = vertexData[name].size() * vertex_size;
+  size_t indexes_bytes = indexesData[name].size() * sizeof(unsigned int);
 
-        // Create VAO
-        glGenVertexArrays(1, &VAO);
-        glBindVertexArray(VAO);
+  std::cout << "name: " << name << std::endl;
+  std::cout << "vertexes_bytes: " << vertexes_bytes << std::endl;
+  std::cout << "indexes_bytes: " << indexes_bytes << std::endl;
 
-        // Generate Vertex Buffers
-        unsigned int VBO, EBO;
+  void *vertex_data = vertexData[name].data();
+  void *indexes_data = indexesData[name].data();
 
-        // Create VBO buffer
-        glGenBuffers(1, &VBO);
-        glGenBuffers(1, &EBO);
+  // Generate Vertex Array Object
+  unsigned int VAO;
 
+  // Create VAO
+  glGenVertexArrays(1, &VAO);
+  glBindVertexArray(VAO);
 
-        geometry[name] = {{VAO, VBO, EBO}, (Vertex*)vertex_data, (unsigned int*)indexes_data, vertexData[name].size(), indexesData[name].size()};
-        // generateTBN(geometry[name]);
+  // Generate Vertex Buffers
+  unsigned int VBO, EBO;
 
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_bytes, indexes_data, GL_STATIC_DRAW);
+  // Create VBO buffer
+  glGenBuffers(1, &VBO);
+  glGenBuffers(1, &EBO);
 
-        // Make VBO buffer active
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertexes_bytes, vertex_data, GL_STATIC_DRAW);
+  geometry[name] = {{VAO, VBO, EBO},
+                    vertexData[name].size(),
+                    indexesData[name].size()};
 
-        unsigned int vertex_size = sizeof(geom::Vertex);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_bytes, indexes_data,
+               GL_STATIC_DRAW);
 
-        // Position
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)0);
-        glEnableVertexAttribArray(0);
+  // Make VBO buffer active
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, vertexes_bytes, vertex_data, GL_STATIC_DRAW);
 
-        // Normal
-        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(3 * sizeof(float)));
-        glEnableVertexAttribArray(1);
+  // Position
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, vertex_size, (void *)0);
+  glEnableVertexAttribArray(0);
 
-        // Texture Coordinate
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, vertex_size, (void*)(6 * sizeof(float)));
-        glEnableVertexAttribArray(2);
+  // Texture Coordinate
+  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, vertex_size,
+                        (void *)(3 * sizeof(float)));
+  glEnableVertexAttribArray(1);
 
-        // Colors
-        glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, vertex_size, (void*)(8 * sizeof(float)));
-        glEnableVertexAttribArray(3);
+  // Normal
+  glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, vertex_size,
+                        (void *)(5 * sizeof(float)));
+  glEnableVertexAttribArray(2);
 
-        glBindVertexArray(0);
+  // Color
+  glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, vertex_size,
+                        (void *)(8 * sizeof(float)));
+  glEnableVertexAttribArray(3);
+
+  glBindVertexArray(0);
 }

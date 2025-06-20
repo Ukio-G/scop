@@ -7,9 +7,9 @@
 
 Camera::Camera(const glm42::vec3 &pos, const glm42::vec3 &rotation): position(pos), rotation(rotation), movementActive(true) {
 	up = {0.0, 1.0, 0.0};
-	front = {0.0, 0.0, -1.0};
+	front = {0.0, 0.0, 1.0};
 	this->right = glm42::cross(front, up);
-	viewMatrix = glm42::lookAt(position, glm42::normalize(pos + front), glm42::normalize(up));
+        viewMatrix = glm42::lookAt(position, glm42::normalize(pos + front), glm42::normalize(up));
 }
 
 void Camera::update(double x, double y, double dx, double dy) {
@@ -42,7 +42,7 @@ void Camera::update(double x, double y, double dx, double dy) {
 
 void Camera::initMovements() {
 	using namespace std::placeholders;
-	double cameraSpeed = 0.2f;
+	float cameraSpeed = 0.2f;
 	auto & eventChannel = EventChannel::getInstance();
 
 	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_W, [&, cameraSpeed](Window * window) {

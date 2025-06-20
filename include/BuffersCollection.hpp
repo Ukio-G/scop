@@ -13,8 +13,6 @@ struct BuffersCollection {
 
 struct Geometry {
 	BuffersCollection buffers;
-	Vertex* vertex_data;
-	unsigned int* index_data;
 	size_t indexes_count;
 	size_t vertexes_count;
 };

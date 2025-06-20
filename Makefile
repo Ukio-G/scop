@@ -1,6 +1,6 @@
 .PHONY: all clean
 # miniRT compilation flags
-CFLAGS = -std=c++17 #-Wextra -Wall -Werror
+CFLAGS = -std=c++20 #-Wextra -Wall -Werror
 INCLUDE = -I. -Imodules/GLWindow -Imodules/Resources -Iinclude -Iinclude/Graphic -Iinclude/IO -Iinclude/ModuleDispatcher
 
 LD_FLAGS += -L. -fPIC -rdynamic

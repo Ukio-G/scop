@@ -31,7 +31,6 @@ add_executable(${APP_TARGET}
         src/Camera.cpp
         src/KeysControls.cpp
         src/mouseHandler.cpp
-        src/Orbit.cpp
 
         modules/Resources/GeometryKeeper.cpp
         modules/Resources/TextureKeeper.cpp
@@ -40,10 +39,10 @@ add_executable(${APP_TARGET}
 )
 
 add_executable(
-        objload_tests
+        math_tests
 
-        include/objLoader.hpp
-        src/objloader_test.cpp
+        src/math_test.cpp
+        src/math_test.cpp
 )
 
 

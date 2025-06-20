@@ -6,7 +6,6 @@
 #include "BuffersCollection.hpp"
 #include "Graphic/TexturesPack.hpp"
 #include "Graphic/Shader.hpp"
-
 class Object3D {
 public:
 	Object3D() = default;
@@ -40,8 +39,8 @@ public:
 	Object3D(Geometry geometry) : geometry(geometry) { }
 
 	void draw(const ShaderProgram & shaderProgram) {
+                updateModelMatrix();
 		bindToDraw(shaderProgram);
-		updateModelMatrix();
 		glDrawElements(GL_TRIANGLES, (GLint)geometry.vertexes_count, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);  
 
@@ -51,16 +50,11 @@ public:
 		bindToDraw();
 		shaderProgram.use();
 		shaderProgram.setMatrix4d("transform", modelMatrix);
- //		shaderProgram.setBool("normalMapUsage", textures->normal());
-//		if (textures->normal())
-//			shaderProgram.setInt("normalMap", ETT_NORMAL);
 	}
 
 	void bindToDraw() {
 		if (textures) {
 			textures->diffuse()->bind();
-//			if (auto normal = textures->normal())
-//				normal->bind(ETT_NORMAL);
 		}
 		glBindVertexArray(geometry.buffers.VAO);
 	}
@@ -70,10 +64,9 @@ public:
 	}
 
 	void setTranslate(const glm42::vec4 &translate) {
-		auto id = glm42::mat4::id();
-
-		translateVector = translate;
-		translateMatrix = glm42::translate(id, translateVector);
+          translateVector = translate;
+          translateMatrix = glm42::mat4::id();
+     	  translateMatrix = glm42::translate(translateMatrix, glm42::vec4(translateVector));
 	}
 	const glm42::vec4 &getRotate() const {
 		return rotateVector;
@@ -81,9 +74,8 @@ public:
 	
 	void setScale(const glm42::vec4 &scale) {
 		scaleVector = scale;
-		scaleMatrix = glm42::mat4(1);
-
-		scaleMatrix = glm42::scale(scaleMatrix, scaleVector);
+		scaleMatrix = glm42::mat4::id();
+		scaleMatrix = glm42::scale(scaleMatrix, glm42::vec4(scaleVector));
 	}
 	
 	void setRotate(float deg, const glm42::vec3 &axis) {
@@ -94,8 +86,6 @@ public:
 	void setRotate(const glm42::vec4 &rotate) {
 		rotateVector = rotate;
 		auto id = glm42::mat4(1);
-
-
 
 		rotationMatrix = glm42::rotate(id, glm42::radians(rotateVector[0]), glm42::vec3(1.0, 0.0, 0.0));
 		rotationMatrix = glm42::rotate(rotationMatrix, glm42::radians(rotateVector[1]), glm42::vec3(0.0, 1.0, 0.0));
@@ -126,9 +116,9 @@ private:
 	glm42::vec4 translateVector = glm42::vec4(0.0);
 	glm42::vec4 scaleVector = glm42::vec4(1.0);
 
-	glm42::mat4 rotationMatrix = glm42::mat4(1.0);
-	glm42::mat4 translateMatrix = glm42::mat4(1.0);
-	glm42::mat4 scaleMatrix = glm42::mat4(1.0);
+	glm42::mat4 rotationMatrix = glm42::mat4::id();
+	glm42::mat4 translateMatrix = glm42::mat4::id();
+	glm42::mat4 scaleMatrix = glm42::mat4::id();
 };
 
 #endif

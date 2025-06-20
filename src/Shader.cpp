@@ -80,5 +80,5 @@ void ShaderProgram::setFloat3d(const std::string &name, const float (&value)[3] 
 
 void ShaderProgram::setMatrix4d(const std::string &name, const glm42::mat4 & mat) const {
     unsigned int matrixID = glGetUniformLocation(shaderProgram, name.c_str());
-//    glUniformMatrix4fv(matrixID, 1, GL_FALSE, glm42::value_ptr(mat));
+    glUniformMatrix4fv(matrixID, 1, GL_FALSE, (const float*)mat.data);
 }

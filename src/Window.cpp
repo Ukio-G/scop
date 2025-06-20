@@ -34,10 +34,6 @@ void Window::initGLFW() {
 	glfwMakeContextCurrent(glfwWindow);
 }
 
-void Window::initUI() {
-
-}
-
 void Window::initGLEW() {
 	// Set this to true so GLEW knows to use a modern approach to retrieving function pointers and extensions
 	glewExperimental = GL_TRUE;
@@ -62,9 +58,7 @@ void Window::startDrawing() {
 void Window::passUniforms() {
 	shaderProgram->setMatrix4d("projection", projectionMatrix);
 	shaderProgram->setMatrix4d("view", camera->viewMatrix);
-	shaderProgram->setFloat3d("lightPos", {30.0, 5.0, 0.0});
 	shaderProgram->setFloat3d("viewPos", camera->position);
-	shaderProgram->setFloat3d("lightColor", {1.0, 1.0, 1.0});
 }
 
 void Window::addObject3DToDraw(Object3D * object3d) {
@@ -75,6 +69,7 @@ void Window::draw3DObjects() {
 	passUniforms();
 	for (auto & object3D: objects3d ) {
 		object3D->draw(*shaderProgram);
+                object3D->updateModelMatrix();
 	}
 }
 
@@ -84,17 +79,19 @@ void Window::drawLoop() {
 
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
-	projectionMatrix = glm42::perspective(45.0f, 800.f/800.f, 0.001f, 1000.0f);
+
+        float aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+	projectionMatrix = glm42::perspective(0.001f, 1000.0f, 45.0f, aspect_ratio);
+
 	while (!glfwWindowShouldClose(glfwWindow)) {
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 
 		keysControls->pollingKeysEvent();
 		mouseControls->pollingMouseEvents();
-
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		
+
 		draw3DObjects();
 		passUniforms();
 
@@ -129,7 +126,7 @@ void Window::initIO() {
 	keysControls = new KeysControls(*this);
 	mouseControls = new MouseControls(*this);
 
-	camera = new Camera({0.0f, 0.0f, 0.0f}, {-270.0f, 0.0f, 0.0f});
+	camera = new Camera({2.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f});
 	camera->initMovements();
 }
 

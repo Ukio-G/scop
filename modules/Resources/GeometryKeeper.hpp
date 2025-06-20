@@ -8,14 +8,13 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 
-
+#include "BuffersCollection.hpp"
+#include "Graphic/Object3D.hpp"
+#include "Vertex.hpp"
+#include <stdexcept>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <stdexcept>
-#include "Vertex.hpp"
-#include "Graphic/Object3D.hpp"
-#include "BuffersCollection.hpp"
 
 class GeometryKeeper {
 public:
@@ -34,8 +33,8 @@ using Ptr = std::shared_ptr<GeometryKeeper>;
 	}
 
 private:
-	std::unordered_map<std::string, std::vector<geom::Vertex> > vertexData;
-	std::unordered_map<std::string, std::vector<size_t> > indexesData;
+  std::unordered_map<std::string, std::vector<geom::Vertex> > vertexData;
+  std::unordered_map<std::string, std::vector<unsigned int> > indexesData;
 };
 
 
