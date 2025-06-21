@@ -4,6 +4,8 @@
 #include <cstring>
 #include <filesystem>
 
+#include "TextureParser.hpp"
+
 struct Context {
   GeometryKeeper *geometryKeeper = nullptr;
   Window * window = nullptr;
@@ -14,11 +16,13 @@ struct Context {
 void addToDraw(Context & ctx, const std::string & name, const std::string & filepath)
 {
   ctx.geometryKeeper->loadGeometryFromFile(name, filepath);
+  TextureParser parser(ctx.texturesKeeper);
+  parser.loadBMPFromFile("../resources/texture.bmp");
 
   Object3D *obj = new Object3D;
   obj->geometry = ctx.geometryKeeper->geometry[name];
   obj->name = name;
-
+  obj->textures = &ctx.texturesKeeper->textures["texture"];
   ctx.window->addObject3DToDraw(obj);
 }
 
@@ -62,7 +66,7 @@ void handleCommandLine(int argc, char **argv, Context & ctx) {
 int main(int argc, char **argv) {
   Context ctx;
 
-  Window w(800, 600);
+  Window w(1800, 1600);
   ctx.window = &w;
 
   GeometryKeeper g_keeper;

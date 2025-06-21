@@ -3,12 +3,13 @@
 
 #include <cmath>
 #include <cstddef>
+#include <iostream>
 #include <optional>
 #include <ostream>
 #include <vector>
 
 namespace glm42 {
-    static constexpr double pi = 3.14159265;
+    static constexpr float pi = 3.14159265;
 
     template<typename T, size_t dim>
     struct vec {
@@ -293,7 +294,7 @@ namespace glm42 {
 
       vec3 uc(u[0] * c_, u[1] * c_, u[2] * c_);
 
-      mat<T, dim> result = mat<T, dim>::id();
+      mat<T, dim> result(m);
 
       result.data[0][0] = u[0] * uc[0] + c;
       result.data[0][1] = u[0] * uc[1] + u[2] * s;

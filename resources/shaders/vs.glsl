@@ -23,6 +23,7 @@ uniform vec3 viewPos;
 
 void main()
 {
+    vs_out.FragPos = vec4(transform * vec4(aPos, 1)).xyz;
     vs_out.Color = aColor;
     flat_color = aColor;
     gl_Position = projection * view * transform * vec4(aPos.x / 3, aPos.y / 3 , aPos.z / 3, 1.0);

@@ -85,11 +85,11 @@ public:
 
 	void setRotate(const glm42::vec4 &rotate) {
 		rotateVector = rotate;
-		auto id = glm42::mat4(1);
+		auto id = glm42::mat4::id();
 
 		rotationMatrix = glm42::rotate(id, glm42::radians(rotateVector[0]), glm42::vec3(1.0, 0.0, 0.0));
-		rotationMatrix = glm42::rotate(rotationMatrix, glm42::radians(rotateVector[1]), glm42::vec3(0.0, 1.0, 0.0));
-		rotationMatrix = glm42::rotate(rotationMatrix, glm42::radians(rotateVector[2]), glm42::vec3(0.0, 0.0, 1.0));
+		rotationMatrix = rotationMatrix * glm42::rotate(id, glm42::radians(rotateVector[1]), glm42::vec3(0.0, 1.0, 0.0));
+		rotationMatrix = rotationMatrix * glm42::rotate(id, glm42::radians(rotateVector[2]), glm42::vec3(0.0, 0.0, 1.0));
 	}
 
 	void updateModelMatrix() {

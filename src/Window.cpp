@@ -68,8 +68,13 @@ void Window::addObject3DToDraw(Object3D * object3d) {
 void Window::draw3DObjects() {
 	passUniforms();
 	for (auto & object3D: objects3d ) {
+		auto rotatons = object3D->getRotate();
+		rotatons.data[1] += .1f;
+		rotatons.data[2] += .1f;
+
+		object3D->setRotate(rotatons);
+		object3D->updateModelMatrix();
 		object3D->draw(*shaderProgram);
-                object3D->updateModelMatrix();
 	}
 }
 

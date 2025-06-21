@@ -68,9 +68,6 @@ Texture &Texture::operator=(Texture &&other) {
 }
 
 void Texture::init() {
-//  stbi_set_flip_vertically_on_load(true);
-//  data = stbi_load(path.c_str(), &width, &height, &numChannels, 0);
-
   if (!data)
     throw std::runtime_error("Failed to load texture: " + path);
   
@@ -87,10 +84,9 @@ void Texture::getGLTexture() {
 
   parameters.apply();
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB + (numChannels == 4), width, height, 0, GL_RGB + (numChannels == 4),
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_BGR + (numChannels == 4), width, height, 0, GL_BGR + (numChannels == 4),
                GL_UNSIGNED_BYTE, data);
 
-//  stbi_image_free(data);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 

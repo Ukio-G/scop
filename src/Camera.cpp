@@ -42,7 +42,7 @@ void Camera::update(double x, double y, double dx, double dy) {
 
 void Camera::initMovements() {
 	using namespace std::placeholders;
-	float cameraSpeed = 0.2f;
+	float cameraSpeed = 0.02f;
 	auto & eventChannel = EventChannel::getInstance();
 
 	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_W, [&, cameraSpeed](Window * window) {

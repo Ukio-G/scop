@@ -31,6 +31,7 @@ add_executable(${APP_TARGET}
         src/Camera.cpp
         src/KeysControls.cpp
         src/mouseHandler.cpp
+        src/TextureParser.cpp
 
         modules/Resources/GeometryKeeper.cpp
         modules/Resources/TextureKeeper.cpp

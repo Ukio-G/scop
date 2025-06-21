@@ -6,6 +6,7 @@
 
 class Texture {
 public:
+  Texture() = default;
   Texture(const std::string &path);
   Texture(const std::string &path, const TextureParameters &parameters);
   Texture(Texture &&other);

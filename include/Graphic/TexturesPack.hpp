@@ -8,13 +8,13 @@
 #include <array>
 
 enum ETextureType {
-    ETT_UNDEFINED = -1, // Servise value
+    ETT_UNDEFINED = -1, // Service value
     
     ETT_DIFFUSE = 0,
     ETT_SPECULAR = 1,
     ETT_NORMAL = 2,
 
-    ETT_MAX = 3, // Servise value
+    ETT_MAX = 3, // Service value
 };
 
 struct TexturesPack {
@@ -41,8 +41,6 @@ struct TexturesPack {
   }
   
   std::array<std::optional<Texture>, 3> textures;
-
-//   std::optional<> material = std::nullopt;
 };
 
 #endif  //!__TEXTURESPACK__H__
