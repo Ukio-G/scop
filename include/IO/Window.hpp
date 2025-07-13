@@ -1,7 +1,6 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-
 // GLEW
 #include "Graphic/Object3D.hpp"
 #include "Graphic/Shader.hpp"
@@ -23,7 +22,6 @@ class MouseControls;
 class Camera; 
 
 class Window {
-	friend class GLWindowModule;
 public:
 using NativeWindowType = GLFWwindow;
 	Window();
@@ -32,7 +30,6 @@ using NativeWindowType = GLFWwindow;
 
 	void init();
 	void initGLFW();
-	void initUI();
 	void initGLEW();
 	void initViewport();
 	void initShaders();
@@ -43,25 +40,23 @@ using NativeWindowType = GLFWwindow;
 
 	void startDrawing();
 	void drawLoop();
-	void drawInterface();
 	void addObject3DToDraw(Object3D*);
 
 	NativeWindowType* getNativeWindowPtr();
 
-	GLFWwindow* glfwWindow;
+	GLFWwindow* glfwWindow = nullptr;
 private:
 	template<class T>
 	using GeometryContainer = std::vector<T>;
 	GeometryContainer<Object3D*> objects3d;
-	ShaderProgram* shaderProgram;
-	ShaderProgram* lineShader;
-	KeysControls* keysControls;
-	MouseControls* mouseControls;
-	Camera* camera;
-	std::thread* renderThr;
+	ShaderProgram* shaderProgram = nullptr;
+	KeysControls* keysControls = nullptr;
+	MouseControls* mouseControls = nullptr;
+	Camera* camera = nullptr;
+	std::thread* renderThr = nullptr;
 	int width;
 	int height;
-	std::string name;
+	std::string name = "window";
 	WindowSettings settings;
 	glm42::mat4 projectionMatrix;
 };

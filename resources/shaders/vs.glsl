@@ -10,7 +10,6 @@ out VS_OUT {
     vec3 Normal;
     vec2 TexCoords;
     vec3 Color;
-
 } vs_out;
 
 flat out vec3 flat_color;
@@ -18,8 +17,9 @@ flat out vec3 flat_color;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 transform;
-
 uniform vec3 viewPos;
+
+uniform float u_time;
 
 void main()
 {

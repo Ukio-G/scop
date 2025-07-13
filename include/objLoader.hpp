@@ -217,7 +217,7 @@ public:
 
     std::cout << "Parse object: " << token << std::endl;
 
-    currentMesh = token;
+    currentMesh = std::move(token);
   }
 
   void LoadNextMesh(std::ifstream &file) {
@@ -256,6 +256,8 @@ public:
       case RecordType::Object:
         parseObject(line);
         break;
+      default:
+          break;
       }
     }
   }

@@ -1,3 +1,6 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
 #include "IO/Window.hpp"
 #include "cfg_parser.hpp"
 #include "modules/Resources/TexturesKeeper.hpp"
@@ -13,17 +16,21 @@ struct Context {
   TexturesKeeper * texturesKeeper = nullptr;
 };
 
-void addToDraw(Context & ctx, const std::string & name, const std::string & filepath)
+void addToDraw(Context & ctx, const std::string & name, const std::string & filepath, const std::string & texture_path)
 {
   ctx.geometryKeeper->loadGeometryFromFile(name, filepath);
-  TextureParser parser(ctx.texturesKeeper);
-  parser.loadBMPFromFile("../resources/texture.bmp");
 
-  Object3D *obj = new Object3D;
-  obj->geometry = ctx.geometryKeeper->geometry[name];
-  obj->name = name;
-  obj->textures = &ctx.texturesKeeper->textures["texture"];
-  ctx.window->addObject3DToDraw(obj);
+  TexturesPack* textures = nullptr;
+  Geometry geometry = ctx.geometryKeeper->geometry[name];
+  if (!texture_path.empty())
+  {
+    TextureParser parser(ctx.texturesKeeper);
+
+    parser.loadBMPFromFile( texture_path );
+    textures = &ctx.texturesKeeper->textures["texture"];
+  }
+
+  ctx.window->addObject3DToDraw(new Object3D(name, geometry, textures));
 }
 
 void handleCommandLine(int argc, char **argv, Context & ctx) {
@@ -40,8 +47,14 @@ void handleCommandLine(int argc, char **argv, Context & ctx) {
 
         auto model_name = std::get<std::string>(section.at("name"));
         auto model_path = std::get<std::string>(section.at("file_path"));
+        std::string texture_path;
+        if ( section.contains( "texture" ) )
+        {
+          texture_path = std::get<std::string>(section.at("texture"));
+          std::cout << "Loading texture: " << texture_path << std::endl;
+        }
 
-        addToDraw(ctx, model_name, model_path);
+        addToDraw(ctx, model_name, model_path, texture_path);
       } catch (std::invalid_argument &argument) {
         std::cout << "error handle section - no such section, skip " << name << std::endl;
       } catch (std::bad_variant_access &bad_variant_access) {
@@ -56,7 +69,7 @@ void handleCommandLine(int argc, char **argv, Context & ctx) {
   else if (argc == 2) {
     std::string model_path(argv[2]);
     std::string model_name = std::filesystem::path(model_path).string();
-    addToDraw(ctx, model_name, model_path);
+    addToDraw(ctx, model_name, model_path, "");
   }
   else {
     throw std::runtime_error("invalid launch options");

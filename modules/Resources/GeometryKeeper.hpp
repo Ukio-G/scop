@@ -1,8 +1,6 @@
 #ifndef GEOMETRY_KEEPER_HPP
 #define GEOMETRY_KEEPER_HPP
 
-#include "Graphic/Line.hpp"
-#include "Graphic/LineStrip.hpp"
 #include <memory>
 
 #include <GL/glew.h>

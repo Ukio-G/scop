@@ -9,7 +9,7 @@
 #include <vector>
 
 namespace glm42 {
-    static constexpr float pi = 3.14159265;
+    static constexpr float pi = 3.14159265f;
 
     template<typename T, size_t dim>
     struct vec {
@@ -22,6 +22,15 @@ namespace glm42 {
             for (int i = 0; i < dim; i++) {
                 data[i] = other.data[i];
             }
+        }
+
+        vec &operator=(const vec &other) {
+          if (this != &other) {
+            for (int i = 0; i < dim; i++) {
+              data[i] = other.data[i];
+            }
+          }
+          return *this;
         }
 
         explicit vec(const vec<T, dim - 1> & other) {
@@ -100,7 +109,7 @@ namespace glm42 {
         }
     };
 
-    inline vec4 operator*(const vec4 lhs, float rhs) {
+    inline vec4 operator*(const vec4 &lhs, float rhs) {
       vec4 result;
 
       result[0] = lhs[0] * rhs;

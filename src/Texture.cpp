@@ -1,3 +1,6 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
 #include "Graphic/TextureParameters.hpp"
 #include <cstring>
 
@@ -15,7 +18,7 @@ Texture::Texture(const std::string &path, const TextureParameters &parameters)
   init();
 }
 
-Texture::Texture(Texture &&other) {
+Texture::Texture(Texture &&other ) noexcept {
   *this = std::move(other);
 }
 
@@ -23,7 +26,7 @@ Texture::Texture(const Texture &other) {
   *this = other;
 }
 
-Texture::~Texture() { }
+Texture::~Texture() = default;
 
 Texture &Texture::operator=(const Texture &other) {
   if (this == &other)
@@ -46,7 +49,11 @@ Texture &Texture::operator=(const Texture &other) {
   return *this;
 }
 
-Texture &Texture::operator=(Texture &&other) {
+Texture &Texture::operator=(Texture &&other ) noexcept
+{
+  if (this == &other)
+    return *this;
+
   path = std::move(other.path);
   parameters = other.parameters;
   width = other.width;

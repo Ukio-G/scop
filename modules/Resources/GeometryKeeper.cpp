@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include "GeometryKeeper.hpp"
 #include <GL/glew.h>
 #include <cstring>
@@ -11,7 +13,6 @@
 
 void GeometryKeeper::loadGeometryFromFile(const std::string &name,
                                           const std::string &objFilename) {
-  bool use_own_loader = false;
   // Initialize Loader
   obj::Loader Loader;
 

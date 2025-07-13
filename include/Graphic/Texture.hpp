@@ -7,24 +7,24 @@
 class Texture {
 public:
   Texture() = default;
-  Texture(const std::string &path);
+  explicit Texture(const std::string &path);
   Texture(const std::string &path, const TextureParameters &parameters);
-  Texture(Texture &&other);
+  Texture(Texture &&other ) noexcept;
   Texture(const Texture &other);
   ~Texture();
   Texture& operator=(const Texture &Texture);
-  Texture& operator=(Texture &&Texture);
+  Texture& operator=(Texture &&Texture ) noexcept;
 
   void init();
   void bind(int type = 0);
   void getGLTexture();
 
-  unsigned int id;
+  unsigned int id = 0;
   std::string path;
   TextureParameters parameters;
-  int width;
-  int height;
-  int numChannels;
+  int width = 0;
+  int height = 0;
+  int numChannels = 0;
   unsigned char *data = nullptr;
   size_t textureSize = 0;
 };

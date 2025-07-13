@@ -28,7 +28,7 @@ public:
 
 	class Topic {
 	public:
-		Topic() { }
+		Topic() = default;
 
 		using ActionsList = std::unordered_map<std::string, ActionsType>;
 		void newAction(const std::string & action_name, ActionsType action_function) {

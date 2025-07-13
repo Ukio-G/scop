@@ -1,3 +1,6 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
+
 #include "Graphic/Object3D.hpp"
 #include "IO/KeysControls.hpp"
 #include "IO/mouseHandler.hpp"
@@ -12,12 +15,8 @@
 #include "IO/Window.hpp"
 
 
-Window::Window() : 
-	height(0), 
-	width(0), 
-	glfwWindow(nullptr), 
-	name("GLWindow"),
-	renderThr(nullptr) { }
+Window::Window() : width( 0 ) , height( 0 ) {
+}
 
 void Window::initGLFW() {
 	// Init GLFW

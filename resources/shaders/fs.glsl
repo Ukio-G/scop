@@ -1,8 +1,10 @@
 #version 330 core
 
 uniform sampler2D diffuseMap;
-
 uniform vec3 viewPos;
+uniform float u_time;
+uniform int u_hasTexture;
+uniform float u_textureColorLerpFactor;
 
 in VS_OUT {
   vec3 FragPos;
@@ -36,7 +38,24 @@ vec3 sampleTriplanar(vec3 pos, vec3 norm) {
 
 
 void main() {
-    vec3 n = fastNormal(fs_in.FragPos);
-    vec3 col = sampleTriplanar(fs_in.FragPos * 4.0, n);
-    FragColor = vec4(col, 1.0);
+    vec3 fast_normal = fastNormal(fs_in.FragPos);
+
+    vec3 triplanarTextureColor = vec3(0, 0, 0);
+    if (u_hasTexture > 0)
+        triplanarTextureColor = sampleTriplanar(fs_in.FragPos * 4.0, fast_normal);
+
+    vec3 vertexColor = fs_in.Color;
+
+    vec3 resultColor = vec3(0);
+
+    if (u_hasTexture > 0)
+    {
+        resultColor = mix(triplanarTextureColor, vertexColor, u_textureColorLerpFactor);
+    }
+    else
+    {
+        resultColor = vertexColor;
+    }
+
+    FragColor = vec4(resultColor, 1.0);
 }
