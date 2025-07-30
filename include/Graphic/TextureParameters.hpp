@@ -1,7 +1,11 @@
 #ifndef TEXTUREPARAMETERS_HPP
 #define TEXTUREPARAMETERS_HPP
 
+#ifdef TARGET_OS_OSX
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 struct TextureParameters {
 	GLint wrapS = GL_REPEAT;

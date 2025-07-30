@@ -4,7 +4,12 @@
 #include <memory>
 
 #include <GL/glew.h>
+
+#ifdef TARGET_OS_OSX
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 #include "BuffersCollection.hpp"
 #include "Graphic/Object3D.hpp"

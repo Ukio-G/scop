@@ -79,7 +79,7 @@ void handleCommandLine(int argc, char **argv, Context & ctx) {
 int main(int argc, char **argv) {
   Context ctx;
 
-  Window w(1800, 1600);
+  Window w(1000, 1000);
   ctx.window = &w;
 
   GeometryKeeper g_keeper;

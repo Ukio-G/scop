@@ -13,7 +13,7 @@
 #include <GL/glew.h>
 
 #include "IO/Window.hpp"
-
+#include "FpsCounter.hpp"
 
 Window::Window() : width( 0 ) , height( 0 ) {
 }
@@ -42,7 +42,9 @@ void Window::initGLEW() {
 }
 
 void Window::initViewport() {
-	glViewport(0, 0, width, height);
+  int fbw, fbh;
+  glfwGetFramebufferSize( glfwWindow, &fbw, &fbh );
+  glViewport( 0, 0, fbw, fbh );
 }
 
 Window::Window(int width, int height) : width(width), height(height), name("Window") {
@@ -84,9 +86,9 @@ void Window::drawLoop() {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-        float aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+    float aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
 	projectionMatrix = glm42::perspective(0.001f, 1000.0f, 45.0f, aspect_ratio);
-
+    FpsCounter counter;
 	while (!glfwWindowShouldClose(glfwWindow)) {
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
@@ -99,6 +101,7 @@ void Window::drawLoop() {
 		draw3DObjects();
 		passUniforms();
 
+		counter.frame();
 		glfwSwapBuffers(glfwWindow);
 	}
 
@@ -112,6 +115,9 @@ void Window::initShaders() {
 	Shader vs("../resources/shaders/vs.glsl", GL_VERTEX_SHADER);
 	Shader fs("../resources/shaders/fs.glsl", GL_FRAGMENT_SHADER);
 	shaderProgram = new ShaderProgram(&vs, &fs);
+
+    shaderProgram->use();
+    shaderProgram->setInt("diffuseMap", 0); // Fallback for frament shader
 }
 
 Window::~Window() {

@@ -4,8 +4,11 @@
 #include "Graphic/TextureParameters.hpp"
 #include <cstring>
 
-
+#ifdef TARGET_OS_OSX
+#include <OpenGL/gl.h>
+#else
 #include <GL/gl.h>
+#endif
 
 #include "Graphic/Texture.hpp"
 #include <stdexcept>
@@ -85,16 +88,24 @@ void Texture::init() {
   getGLTexture();
 }
 
-void Texture::getGLTexture() {
-  glGenTextures(1, &id);
-  glBindTexture(GL_TEXTURE_2D, id);
+void Texture::getGLTexture()
+{
+  glGenTextures( 1, &id );
+  glBindTexture( GL_TEXTURE_2D, id );
 
+  std::cout << "Texture ID: " << id << std::endl;
   parameters.apply();
 
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_BGR + (numChannels == 4), width, height, 0, GL_BGR + (numChannels == 4),
-               GL_UNSIGNED_BYTE, data);
+  const GLint  internal = ( numChannels == 4 ) ? GL_RGBA8 : GL_RGB8;  // корректный internalFormat
+  const GLenum external = ( numChannels == 4 ) ? GL_BGRA : GL_BGR;    // раскладка исходных байт
 
-  glBindTexture(GL_TEXTURE_2D, 0);
+
+  glTexImage2D( GL_TEXTURE_2D, 0, internal, width, height, 0, external, GL_UNSIGNED_BYTE, data );
+
+  glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+  glGenerateMipmap( GL_TEXTURE_2D );
+
+  glBindTexture( GL_TEXTURE_2D, 0 );
 }
 
 void Texture::bind(int type) {
