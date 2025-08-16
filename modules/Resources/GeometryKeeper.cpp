@@ -58,9 +58,10 @@ void GeometryKeeper::loadGeometryFromFile(const std::string &name,
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &EBO);
 
-  geometry[name] = {{VAO, VBO, EBO},
-                    vertexData[name].size(),
-                    indexesData[name].size()};
+  geometry[name] = {{VAO, VBO, EBO}, {}, {},
+                    indexesData[name].size(),
+                    vertexData[name].size()
+                    };
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexes_bytes, indexes_data,

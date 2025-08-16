@@ -51,12 +51,12 @@ public:
 
 		if (leftBtnPressed) {
 			for (auto &handler: leftClickHandlers)
-				handler.second(pos[0], pos[0]);
+				handler.second(pos[0], pos[1]);
 		}
 
 		if (rightBtnPressed) {
 			for (auto &handler: rightClickHandlers)
-				handler.second(pos[0], pos[0]);
+				handler.second(pos[0], pos[1]);
 		}
 
 		for (auto &handler: moveClickHandlers)

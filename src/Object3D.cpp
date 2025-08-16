@@ -43,7 +43,7 @@ void Object3D::draw( const ShaderProgram& shaderProgram ) {
     updateModelMatrix();
 
   bindToDraw( shaderProgram );
-  glDrawElements( GL_TRIANGLES, ( GLint )geometry.vertexes_count, GL_UNSIGNED_INT, 0 );
+  glDrawElements( GL_TRIANGLES, ( GLint )geometry.indexes_count, GL_UNSIGNED_INT, 0 );
   glBindVertexArray( 0 );
 }
 
