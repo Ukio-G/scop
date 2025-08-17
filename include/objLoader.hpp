@@ -112,6 +112,7 @@ public:
 
     // Need to insert
     vtxes.push_back(vtx);
+    meshes[currentMesh].bbox << vtx;
     return vtxes.size() - 1;
   }
 
@@ -269,7 +270,8 @@ public:
 
         std::cout << "Vertexes count:" << mesh.vertexes.size() << std::endl;
         std::cout << "Indexes count:" << mesh.indexes.size() << std::endl;
-
+        std::cout << "Bound box: \n";
+        std::cout << mesh.bbox;
 
         std::cout << "Vertexes: " << std::endl;
         for (auto & vtx : mesh.vertexes)

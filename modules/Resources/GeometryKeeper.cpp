@@ -58,7 +58,7 @@ void GeometryKeeper::loadGeometryFromFile(const std::string &name,
   glGenBuffers(1, &VBO);
   glGenBuffers(1, &EBO);
 
-  geometry[name] = {{VAO, VBO, EBO}, {}, {},
+  geometry[name] = {{VAO, VBO, EBO}, mesh.bbox,
                     indexesData[name].size(),
                     vertexData[name].size()
                     };

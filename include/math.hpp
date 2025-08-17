@@ -1,6 +1,7 @@
 #ifndef MATH_42_HPP
 #define MATH_42_HPP
 
+#include <algorithm>
 #include <cmath>
 #include <cstddef>
 #include <iostream>
@@ -446,7 +447,53 @@ namespace glm42 {
     return os;
   }
 
+  struct BoundBox {
+    struct Dim {
+      float min = 0.f;
+      float max = 0.f;
+    };
+
+    BoundBox& operator=(const BoundBox& other) = default;
+
+    Dim x{};
+    Dim y{};
+    Dim z{};
+
+    glm42::vec3 center() {
+      return {
+        (x.max - x.min) / 2,
+        (y.max - y.min) / 2,
+        (z.max - z.min) / 2
+      };
+    }
+  };
+
+  inline BoundBox& operator<<(BoundBox& bbox, const geom::Vertex &vtx) {
+    auto & [x, y, z] = vtx.pos.data;
+
+    bbox.x.min = std::min(x, bbox.x.min);
+    bbox.x.max = std::max(x, bbox.x.max);
+
+    bbox.y.min = std::min(y, bbox.y.min);
+    bbox.y.max = std::max(y, bbox.y.max);
+
+    bbox.z.min = std::min(z, bbox.z.min);
+    bbox.z.max = std::max(z, bbox.z.max);
+
+    return bbox;
+  }
+
+  inline std::ostream & operator<<(std::ostream &os, const BoundBox& bbox) {
+    os << "X: (" << bbox.x.min << ", " << bbox.x.max << ")\n";
+    os << "Y: (" << bbox.y.min << ", " << bbox.y.max << ")\n";
+    os << "Z: (" << bbox.z.min << ", " << bbox.z.max << ")\n";
+
+    return os;
+  }
+
+
   struct Mesh {
+    BoundBox bbox {};
     std::vector<geom::Vertex> vertexes;
     std::vector<unsigned int> indexes;
   };
