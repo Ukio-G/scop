@@ -38,6 +38,8 @@ public:
     currentMesh = p.stem();
 
     LoadNextMesh(file);
+
+    recenterOriginToBoundBoxCenter(currentMesh);
   }
 
   static inline size_t skip_spaces(const std::string & line, size_t pos = 0) {
@@ -260,6 +262,14 @@ public:
       default:
           break;
       }
+    }
+  }
+
+  void recenterOriginToBoundBoxCenter(const std::string & meshName) {
+    auto & vtxs = meshes[meshName].vertexes;
+    auto &bbox = meshes[meshName].bbox;
+    for (auto &vtx : vtxs) {
+      vtx.pos = vtx.pos - bbox.center();
     }
   }
 

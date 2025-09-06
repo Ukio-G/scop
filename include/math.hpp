@@ -461,9 +461,9 @@ namespace glm42 {
 
     glm42::vec3 center() {
       return {
-        (x.max - x.min) / 2,
-        (y.max - y.min) / 2,
-        (z.max - z.min) / 2
+        0.5f * (x.min + x.max),
+        0.5f * (y.min + y.max),
+        0.5f * (z.min + z.max)
       };
     }
   };

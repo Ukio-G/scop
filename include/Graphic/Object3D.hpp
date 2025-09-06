@@ -35,8 +35,11 @@ public:
   const glm42::mat4 &getRotationMatrix() const;
   const glm42::mat4 &getTranslateMatrix() const;
   const glm42::mat4 &getScaleMatrix() const;
+  const glm42::mat4 &getModelMatrix() const;
   void               setUseTexture( bool use_texture );
 
+
+  geom::BoundBox getBoundBox() const;
 private:
   std::string   name;
   Geometry      geometry;

@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 
 #include "Graphic/Object3D.hpp"
+#include "math.hpp"
 
 
 Object3D::Object3D( const Object3D& other ) {
@@ -135,6 +136,14 @@ const glm42::mat4& Object3D::getTranslateMatrix() const {
 
 const glm42::mat4& Object3D::getScaleMatrix() const {
   return scaleMatrix;
+}
+
+const glm42::mat4& Object3D::getModelMatrix() const {
+  return modelMatrix;
+}
+
+geom::BoundBox Object3D::getBoundBox() const {
+  return geometry.bbox;
 }
 
 void Object3D::setUseTexture(bool use_texture)

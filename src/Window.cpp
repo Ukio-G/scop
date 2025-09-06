@@ -8,12 +8,12 @@
 #include "modules/Resources/GeometryKeeper.hpp"
 #include <stdexcept>
 #include <thread>
-
+#include "Graphic/RenderUtils/WireBBoxManager.hpp"
 
 #include <GL/glew.h>
 
 #include "IO/Window.hpp"
-#include "FpsCounter.hpp"
+#include "FPSCounter.hpp"
 
 Window::Window() : width( 0 ) , height( 0 ) {
 }
@@ -70,8 +70,8 @@ void Window::draw3DObjects() {
 	passUniforms();
 	for (auto & object3D: objects3d ) {
 		auto rotatons = object3D->getRotate();
-		rotatons.data[1] += .1f;
-		rotatons.data[2] += .1f;
+		// rotatons.data[1] += .1f;
+		rotatons.data[0] += .1f;
 
 		object3D->setRotate(rotatons);
 		object3D->updateModelMatrix();
@@ -80,6 +80,8 @@ void Window::draw3DObjects() {
 }
 
 void Window::drawLoop() {
+	WireBBoxManager wbox;
+  wbox.init();
 	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwMakeContextCurrent(glfwWindow);
 
@@ -101,7 +103,11 @@ void Window::drawLoop() {
 		draw3DObjects();
 		passUniforms();
 
-		counter.frame();
+
+		for (auto &object: objects3d) {
+      wbox.draw(camera->viewMatrix, projectionMatrix, object->getModelMatrix() ,{1.0, 1.0, 1.0}, object->getBoundBox());
+		}
+		// counter.frame();
 		glfwSwapBuffers(glfwWindow);
 	}
 
