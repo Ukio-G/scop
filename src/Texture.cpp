@@ -1,12 +1,11 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
-
-#include "Graphic/TextureParameters.hpp"
 #include <cstring>
 
 #ifdef TARGET_OS_OSX
 #include <OpenGL/gl.h>
 #else
+#include <GL/glew.h>
 #include <GL/gl.h>
 #endif
 
