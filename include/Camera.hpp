@@ -6,8 +6,15 @@
 class Camera {
 public:
 	Camera(const glm42::vec3 & pos, const glm42::vec3 &rotation);
-	void initMovements();
-	void update(double x, double y, double dx, double dy);
+	void initMovements() noexcept;
+	void update(double x, double y, double dx, double dy) noexcept;
+	inline void updateViewMatrix() noexcept {
+    if (!dirtyFlag)
+      return;
+
+    viewMatrix = glm42::lookAt(position, position + front, up);
+    dirtyFlag = false;
+  }
 
 	glm42::vec3 position;
 	glm42::vec3 rotation;
@@ -18,5 +25,7 @@ public:
 
 	glm42::mat4 viewMatrix;
 	bool movementActive;
+	bool dirtyFlag = true;
+  double dt = { 0.0 };
 };
 #endif

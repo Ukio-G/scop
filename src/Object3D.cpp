@@ -58,7 +58,6 @@ void Object3D::bindToDraw( const ShaderProgram& shaderProgram ) {
 
   glBindVertexArray( geometry.buffers.VAO );
 
-  shaderProgram.use();
   shaderProgram.setMatrix4d( "transform", modelMatrix );
   shaderProgram.setBool( "u_hasTexture", useTexture );
   shaderProgram.setFloat( "u_textureColorLerpFactor", textureColorLerpFactor );

@@ -13,12 +13,12 @@ class FpsCounter
 
 public:
   // Вызывайте 1 раз на каждый отрисованный кадр
-  void frame()
+  inline void frame()
   {
     ++frames_;
     auto   now = clock::now();
     double sec = std::chrono::duration< double >( now - last_report_ ).count();
-    if( sec >= 0.1 )
+    if( sec >= 1 )
     {
       last_fps_ = frames_ / sec;
       std::cout << "FPS: " << std::fixed << std::setprecision( 1 ) << last_fps_ << '\n';

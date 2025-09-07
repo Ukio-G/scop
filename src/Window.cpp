@@ -67,14 +67,13 @@ void Window::addObject3DToDraw(Object3D * object3d) {
 }
 
 void Window::draw3DObjects() {
+  shaderProgram->use();
 	passUniforms();
 	for (auto & object3D: objects3d ) {
 		auto rotatons = object3D->getRotate();
-		// rotatons.data[1] += .1f;
 		rotatons.data[0] += .1f;
 
 		object3D->setRotate(rotatons);
-		object3D->updateModelMatrix();
 		object3D->draw(*shaderProgram);
 	}
 }
@@ -84,37 +83,40 @@ void Window::drawLoop() {
   wbox.init();
 	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	glfwMakeContextCurrent(glfwWindow);
-
+  glfwSwapInterval(1);
+    
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 
-    float aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
+  float aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
 	projectionMatrix = glm42::perspective(0.001f, 1000.0f, 45.0f, aspect_ratio);
-    FpsCounter counter;
+  FpsCounter counter;
 	while (!glfwWindowShouldClose(glfwWindow)) {
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
-		glfwPollEvents();
-
+		//glfwPollEvents();
 		keysControls->pollingKeysEvent();
 		mouseControls->pollingMouseEvents();
-		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    camera->updateViewMatrix();
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		draw3DObjects();
-		passUniforms();
+		// passUniforms();
 
 
-		for (auto &object: objects3d) {
-      wbox.draw(camera->viewMatrix, projectionMatrix, object->getModelMatrix() ,{1.0, 1.0, 1.0}, object->getBoundBox());
-		}
-		// counter.frame();
-		glfwSwapBuffers(glfwWindow);
+		// for (auto &object: objects3d) {
+    //  wbox.draw(camera->viewMatrix, projectionMatrix, object->getModelMatrix() ,{1.0, 1.0, 1.0}, object->getBoundBox());
+		// }
+    
+    counter.frame();
+ 
+    glfwSwapBuffers(glfwWindow);
+    glfwPollEvents();
 	}
 
 	std::cout << "Draw loop destroyed" << std::endl;
-	glfwTerminate();
-    EventChannel::getInstance().publish("destroyApplication", true);
-
+  EventChannel::getInstance().publish("destroyApplication", true);
+  glfwTerminate();
 }
 
 void Window::initShaders() {
