@@ -33,7 +33,7 @@ void GeometryKeeper::loadGeometryFromFile(const std::string &name,
     vtx.color[2] = 1.0f / static_cast<float>(1 + (i++) % 5);
   }
 
-  unsigned int vertex_size = sizeof(geom::Vertex);
+  GLsizei vertex_size = sizeof(geom::Vertex);
   size_t vertexes_bytes = vertexData[name].size() * vertex_size;
   size_t indexes_bytes = indexesData[name].size() * sizeof(unsigned int);
 
