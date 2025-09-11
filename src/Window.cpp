@@ -72,7 +72,7 @@ void Window::addObject3DToDraw(Object3D * object3d) {
 
 void Window::draw3DObjects() {
   shaderProgram->use();
-	passUniforms();
+  passUniforms();
 	for (auto & object3D: objects3d ) {
 		object3D->draw(*shaderProgram);
 	}
@@ -82,12 +82,15 @@ void Window::drawLoop() {
   WireBBoxManager          wbox;
   TransformationBehaviours behaviours;
   ObjectsControls          objControls( this, objects3d, behaviours );
+  ShadersControls          shadersControls ( shaderProgram );
 
   wbox.init();
   glfwSetInputMode( glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
   glfwMakeContextCurrent( glfwWindow );
   glfwSwapInterval( 1 );
+
   objControls.initControls();
+  shadersControls.initControls();
 
   glEnable( GL_DEPTH_TEST );
   glEnable( GL_CULL_FACE );
@@ -100,11 +103,13 @@ void Window::drawLoop() {
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
+
     keysControls->pollingKeysEvent();
     mouseControls->pollingMouseEvents();
     camera->updateViewMatrix();
 
     behaviours.update();
+    shadersControls.update();
 
     draw3DObjects();
     wbox.draw( camera->viewMatrix, projectionMatrix, **objControls.m_selectedObjectIt );

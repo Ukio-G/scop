@@ -29,6 +29,7 @@ add_executable(${APP_TARGET}
     modules/Resources/GeometryKeeper.cpp
     modules/Resources/TextureKeeper.cpp
     src/IO/ObjectsControls.cpp
+    src/IO/ShadersControls.cpp
 )
 
 add_executable(math_tests src/math_test.cpp)
