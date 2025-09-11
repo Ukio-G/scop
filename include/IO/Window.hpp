@@ -38,7 +38,6 @@ using NativeWindowType = GLFWwindow;
 	void passUniforms();
 	void draw3DObjects();
 
-	void startDrawing();
 	void drawLoop();
 	void addObject3DToDraw(Object3D*);
 
@@ -49,13 +48,15 @@ private:
 	template<class T>
 	using GeometryContainer = std::vector<T>;
 	GeometryContainer<Object3D*> objects3d;
+
 	ShaderProgram* shaderProgram = nullptr;
 	KeysControls* keysControls = nullptr;
 	MouseControls* mouseControls = nullptr;
 	Camera* camera = nullptr;
-	std::thread* renderThr = nullptr;
+
 	int width;
 	int height;
+
 	std::string name = "window";
 	WindowSettings settings;
 	glm42::mat4 projectionMatrix;

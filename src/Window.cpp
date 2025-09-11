@@ -55,11 +55,6 @@ Window::Window(int width, int height) : width(width), height(height), name("Wind
 	init();
 }
 
-void Window::startDrawing() {
-	glfwMakeContextCurrent(NULL);
-	renderThr = new std::thread(&Window::drawLoop, this);
-}
-
 void Window::passUniforms() {
 	shaderProgram->setMatrix4d("projection", projectionMatrix);
 	shaderProgram->setMatrix4d("view", camera->viewMatrix);
@@ -135,9 +130,6 @@ void Window::initShaders() {
 }
 
 Window::~Window() {
-	renderThr->join();
-	
-	delete renderThr;
 	glfwDestroyWindow(glfwWindow);
 
 	delete shaderProgram;

@@ -5,6 +5,8 @@ uniform vec3 viewPos;
 uniform float u_time;
 uniform int u_hasTexture;
 uniform float u_textureColorLerpFactor;
+uniform bool u_flatShading;
+uniform bool u_grayscale;
 
 in VS_OUT {
   vec3 FragPos;
@@ -44,8 +46,18 @@ void main() {
     if (u_hasTexture > 0)
         triplanarTextureColor = sampleTriplanar(fs_in.FragPos * 4.0, fast_normal);
 
-    vec3 vertexColor = fs_in.Color;
-
+    vec3 vertexColor = vec3(0);
+    if (u_flatShading)
+        vertexColor = flat_color;
+    else
+        vertexColor = fs_in.Color;
+    
+    if (u_grayscale) {
+        float graylevel = (vertexColor[0] + vertexColor[1] + vertexColor[2]) / 3;
+        vertexColor[0] = graylevel;
+        vertexColor[1] = graylevel;
+        vertexColor[2] = graylevel;
+    }
     vec3 resultColor = vec3(0);
 
     if (u_hasTexture > 0)
