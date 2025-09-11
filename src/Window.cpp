@@ -3,8 +3,10 @@
 
 #include "Graphic/Object3D.hpp"
 #include "IO/KeysControls.hpp"
+#include "IO/ObjectsControls.hpp"
 #include "IO/mouseHandler.hpp"
 #include "Camera.hpp"
+#include "math.hpp"
 #include "modules/Resources/GeometryKeeper.hpp"
 #include <stdexcept>
 #include <thread>
@@ -14,6 +16,8 @@
 
 #include "IO/Window.hpp"
 #include "FPSCounter.hpp"
+#include "include/TransfromBehaviour/TransfromBehaviour.hpp"
+#include "include/IO/ShadersControls.hpp"
 
 Window::Window() : width( 0 ) , height( 0 ) {
 }
@@ -70,52 +74,49 @@ void Window::draw3DObjects() {
   shaderProgram->use();
 	passUniforms();
 	for (auto & object3D: objects3d ) {
-		auto rotatons = object3D->getRotate();
-		rotatons.data[0] += .1f;
-
-		object3D->setRotate(rotatons);
 		object3D->draw(*shaderProgram);
 	}
 }
 
 void Window::drawLoop() {
-	WireBBoxManager wbox;
+  WireBBoxManager          wbox;
+  TransformationBehaviours behaviours;
+  ObjectsControls          objControls( this, objects3d, behaviours );
+
   wbox.init();
-	glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-	glfwMakeContextCurrent(glfwWindow);
-  glfwSwapInterval(1);
-    
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
+  glfwSetInputMode( glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+  glfwMakeContextCurrent( glfwWindow );
+  glfwSwapInterval( 1 );
+  objControls.initControls();
 
-  float aspect_ratio = static_cast<float>(width) / static_cast<float>(height);
-	projectionMatrix = glm42::perspective(0.001f, 1000.0f, 45.0f, aspect_ratio);
+  glEnable( GL_DEPTH_TEST );
+  glEnable( GL_CULL_FACE );
+
+  float aspect_ratio = static_cast< float >( width ) / static_cast< float >( height );
+  projectionMatrix   = glm42::perspective( 0.001f, 1000.0f, 45.0f, aspect_ratio );
   FpsCounter counter;
-	while (!glfwWindowShouldClose(glfwWindow)) {
-		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
-		//glfwPollEvents();
-		keysControls->pollingKeysEvent();
-		mouseControls->pollingMouseEvents();
+
+  while( !glfwWindowShouldClose( glfwWindow ) ) {
+    glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    keysControls->pollingKeysEvent();
+    mouseControls->pollingMouseEvents();
     camera->updateViewMatrix();
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		draw3DObjects();
-		// passUniforms();
+    behaviours.update();
 
+    draw3DObjects();
+    wbox.draw( camera->viewMatrix, projectionMatrix, **objControls.m_selectedObjectIt );
 
-		// for (auto &object: objects3d) {
-    //  wbox.draw(camera->viewMatrix, projectionMatrix, object->getModelMatrix() ,{1.0, 1.0, 1.0}, object->getBoundBox());
-		// }
-    
     counter.frame();
- 
-    glfwSwapBuffers(glfwWindow);
-    glfwPollEvents();
-	}
 
-	std::cout << "Draw loop destroyed" << std::endl;
-  EventChannel::getInstance().publish("destroyApplication", true);
+    glfwSwapBuffers( glfwWindow );
+    glfwPollEvents();
+  }
+
+  std::cout << "Draw loop destroyed" << std::endl;
+  EventChannel::getInstance().publish( "destroyApplication", true );
   glfwTerminate();
 }
 
@@ -124,8 +125,8 @@ void Window::initShaders() {
 	Shader fs("../resources/shaders/fs.glsl", GL_FRAGMENT_SHADER);
 	shaderProgram = new ShaderProgram(&vs, &fs);
 
-    shaderProgram->use();
-    shaderProgram->setInt("diffuseMap", 0); // Fallback for frament shader
+  shaderProgram->use();
+  shaderProgram->setInt("diffuseMap", 0);
 }
 
 Window::~Window() {

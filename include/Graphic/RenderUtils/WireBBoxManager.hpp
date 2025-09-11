@@ -34,8 +34,10 @@ public:
 
 
 
-  void draw(const glm42::mat4& view, const glm42::mat4& projection, const glm42::mat4& modelMatrix, const glm42::vec3& color, const geom::BoundBox & bbox) {
+  void draw(const glm42::mat4& view, const glm42::mat4& projection, const Object3D& obj) {
       glm42::mat4 bboxLocal = glm42::mat4::id();
+      auto bbox = obj.getBoundBox();
+      auto modelMatrix = obj.getModelMatrix();
 
       float dx = bbox.x.max - bbox.x.min;
       float dy = bbox.y.max - bbox.y.min;

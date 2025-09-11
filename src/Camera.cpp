@@ -44,13 +44,14 @@ void Camera::update(double x, double y, double dx, double dy) noexcept {
 		direction[1] = sin(glm42::radians(pitch));
 		direction[2] = sin(glm42::radians(yaw)) * cos(glm42::radians(pitch));
 		front = glm42::normalize(direction);
+    right = glm42::normalize(glm42::cross(front, up));
 
     dirtyFlag = true;
 }
 
 void Camera::initMovements() noexcept {
 	using namespace std::placeholders;
-	float cameraSpeed = 1.f;
+	float cameraSpeed = 4.f;
 	auto & eventChannel = EventChannel::getInstance();
 
 	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_W, [&, cameraSpeed](Window * window) {

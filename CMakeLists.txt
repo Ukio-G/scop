@@ -10,6 +10,9 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "")
 # Подавляем ворнинги об устаревшем OpenGL в Xcode/Clang
 add_compile_definitions(GL_SILENCE_DEPRECATION)
 
+set(CMAKE_C_COMPILER /opt/homebrew/opt/llvm@19/bin/clang)
+set(CMAKE_CXX_COMPILER /opt/homebrew/opt/llvm@19/bin/clang++)
+
 #–– Зависимости ––––––––––––––––––––––––––––––––––––––––––––––
 find_package(OpenGL REQUIRED)          # даёт импорт-таргет OpenGL::GL
 find_package(GLEW   REQUIRED)          # импорт-таргет GLEW::GLEW
@@ -25,6 +28,7 @@ add_executable(${APP_TARGET}
     src/mouseHandler.cpp src/TextureParser.cpp
     modules/Resources/GeometryKeeper.cpp
     modules/Resources/TextureKeeper.cpp
+    src/IO/ObjectsControls.cpp
 )
 
 add_executable(math_tests src/math_test.cpp)
@@ -36,6 +40,10 @@ target_link_libraries(${APP_TARGET}
     glfw              # кроссплатформенное окно/ввод
     OpenGL::GL        # системный фреймворк OpenGL
 )
+
+# Путь до библотек и стандартных заголовочных файлов
+target_include_directories(${APP_TARGET} PRIVATE /opt/homebrew/opt/llvm@19/include)
+target_link_directories(${APP_TARGET} PRIVATE /opt/homebrew/opt/llvm@19/lib)
 
 target_link_libraries(math_tests
     PRIVATE

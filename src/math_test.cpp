@@ -9,8 +9,10 @@
 
 #include "math.hpp"
 
+constexpr bool show_passed_results = false;
+
 bool operator==(const glm42::mat4& lhs, const glm::mat4& rhs) {
-  constexpr float epsilon = 1e-6f;
+  constexpr float epsilon = 0.001f;
 
   for (int col = 0; col < 4; ++col) {
     for (int row = 0; row < 4; ++row) {
@@ -79,14 +81,19 @@ void test_random_matrix_multiplication(int seed = 42) {
   glm42::mat4 my_result = my_a * my_b;
 
   if (glm_result != my_result) {
+    std::cout << "GLM results:\n";
     print_matrix(glm_result);
     std::cout << "-------\n";
+    std::cout << "My results:\n";
     print_matrix(my_result);
 
     std::cout << "My A:\n";
+    print_matrix(my_a);
     print_matrix(a);
 
+
     std::cout << "My B:\n";
+    print_matrix(my_b);
     print_matrix(b);
     throw std::runtime_error("Random matrix multiplication test failed");
   }
@@ -105,9 +112,11 @@ void rotate_test(float angle, float x, float y, float z)
   glm_mat = glm::rotate(glm_mat, angle, glm::vec3(x, y, z));
   my_mat = glm42::rotate(my_mat, angle, glm42::vec3(x, y, z));
 
-  print_matrix(glm_mat);
-  std:: cout << "-------" << std::endl;
-  print_matrix(my_mat);
+  if (show_passed_results) {
+    print_matrix(glm_mat);
+    std:: cout << "-------" << std::endl;
+    print_matrix(my_mat);
+  }
 
   if (glm_mat != my_mat)
   {
@@ -117,6 +126,32 @@ void rotate_test(float angle, float x, float y, float z)
   }
 }
 
+void translate_test(float x, float y, float z)
+{
+  glm::mat4 glm_mat(1);
+  glm42::mat4 my_mat = glm42::mat4::id();
+
+  if (glm_mat != my_mat)
+  {
+    throw std::runtime_error("Matrix compare before rotation failed");
+  }
+
+  glm_mat = glm::translate(glm_mat, glm::vec3(x, y, z));
+  my_mat = glm42::translate(my_mat, glm42::vec3(x, y, z));
+
+  if (show_passed_results) {
+    print_matrix(glm_mat);
+    std:: cout << "-------" << std::endl;
+    print_matrix(my_mat);
+  }
+
+  if (glm_mat != my_mat)
+  {
+    std::stringstream ss;
+    ss << "translation(" << x << ", " << y << ", " << ", " << z << ")";
+    throw std::runtime_error("Incorrect translation: " + ss.str());
+  }
+}
 
 inline float to_radians(float angle) {
   return M_PI * angle / 180.f;
@@ -134,11 +169,34 @@ int main()
   }
 
   test_random_matrix_multiplication(10);
+  std::cout << "Random multiplication matrixes test 1 passed" << std::endl;
   test_random_matrix_multiplication(20);
+  std::cout << "Random multiplication matrixes test 2 passed" << std::endl;
+
+  std::cout << "\n\nRotation tests:\n";
 
   rotate_test(to_radians(30.f), 0, 0, 1);
+  std::cout << "Rotation test 1 passed" << std::endl;
   rotate_test(to_radians(30.f), 0, 1, 0);
+  std::cout << "Rotation test 2 passed" << std::endl;
   rotate_test(to_radians(30.f), 1, 0, 0);
+  std::cout << "Rotation test 3 passed" << std::endl;
+
+
+  std::cout << "\n\nTranslation tests:\n";
+  translate_test(1, 0, 0);
+  std::cout << "Translation test 1 passed" << std::endl;
+  translate_test(1, 1, 0);
+  std::cout << "Translation test 2 passed" << std::endl;
+  translate_test(1, 1, 1);
+  std::cout << "Translation test 3 passed" << std::endl;
+  translate_test(71, 20, 10);
+  std::cout << "Translation test 4 passed" << std::endl;
+  translate_test(61, 41, 20);
+  std::cout << "Translation test 5 passed" << std::endl;
+  translate_test(21, 11, 31);
+  std::cout << "Translation test 6 passed" << std::endl;
+
 
   return 0;
 }

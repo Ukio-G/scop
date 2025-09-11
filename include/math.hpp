@@ -268,12 +268,17 @@ namespace glm42 {
 
     // Builds a translation 4 * 4 matrix created from a vector of 3 components
     template<typename T, size_t dim>
+    inline mat<T, dim> translate(const mat<T, dim> &m, const vec<T, dim - 1> &v) {
+        return translate(m, vec<T, dim>(v));
+    }
+
+    template<typename T, size_t dim>
     inline mat<T, dim> translate(const mat<T, dim>& m, vec<T, dim> v) {
       static_assert(dim == 4, "translate is defined for 4x4 matrices only");
 
       mat<T, dim> result = m;
       for (size_t i = 0; i < 3; ++i) {
-        result.data[i][3] += v.data[0] * m.data[i][0] +
+        result.data[3][i] += v.data[0] * m.data[i][0] +
                              v.data[1] * m.data[i][1] +
                              v.data[2] * m.data[i][2];
       }

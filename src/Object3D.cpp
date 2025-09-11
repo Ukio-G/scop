@@ -117,7 +117,7 @@ void Object3D::setRotate( const glm42::vec4& rotate ) {
 
 
 void Object3D::updateModelMatrix() {
-  modelMatrix = rotationMatrix * translateMatrix * scaleMatrix;
+  modelMatrix = translateMatrix * rotationMatrix * scaleMatrix;
 
   dirtyTransform = false;
 }
