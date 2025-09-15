@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "Graphic/Object3D.hpp"
-#include "TransfromBehaviour/TransfromBehaviour.hpp"
+#include "TransformBehaviour/TransformBehaviour.hpp"
 #include "include/IO/Window.hpp"
 
 class ObjectsControls {

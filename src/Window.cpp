@@ -17,7 +17,7 @@
 
 #include "IO/Window.hpp"
 #include "FPSCounter.hpp"
-#include "include/TransfromBehaviour/TransfromBehaviour.hpp"
+#include "include/TransformBehaviour/TransformBehaviour.hpp"
 #include "include/IO/ShadersControls.hpp"
 
 Window::Window() : width( 0 ) , height( 0 ) {
