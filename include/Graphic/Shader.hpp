@@ -19,7 +19,7 @@ public:
     }
     ~Shader() {
         glDeleteShader(shaderID);
-        delete shaderSource;
+        delete [] shaderSource;
     }
 };
 

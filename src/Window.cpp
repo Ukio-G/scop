@@ -1,6 +1,7 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 
+#include "EventChannel.hpp"
 #include "Graphic/Object3D.hpp"
 #include "IO/KeysControls.hpp"
 #include "IO/ObjectsControls.hpp"
@@ -136,6 +137,9 @@ Window::~Window() {
 	delete keysControls;
 	delete mouseControls;
 	delete camera;
+  for (auto obj_ptr : objects3d) {
+    delete obj_ptr;
+  }
 }
 
 void Window::initIO() {
@@ -144,6 +148,10 @@ void Window::initIO() {
 
 	camera = new Camera({2.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f});
 	camera->initMovements();
+
+  EventChannel::getInstance().publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_ESCAPE, [this](Window * window) {
+      glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE);
+  }));
 }
 
 Window::NativeWindowType* Window::getNativeWindowPtr() {

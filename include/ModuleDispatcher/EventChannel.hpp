@@ -129,16 +129,23 @@ public:
 	}
 
 	static EventChannel& getInstance() {
-		static EventChannel* _instance;
-		if (!_instance)
-			_instance = new EventChannel();
-		return *_instance;
+		if (!EventChannel::_instance)
+			EventChannel::_instance = new EventChannel();
+		return *EventChannel::_instance;
 	}
+
+	static void destroy() {
+		delete _instance;
+		_instance = nullptr;
+	}
+
 
 	EventChannel(EventChannel &) = delete;
 	EventChannel(EventChannel &&) = delete;
 	EventChannel& operator=(const EventChannel&) = delete;
+	~EventChannel() {}
 private:
+	inline static EventChannel* _instance = nullptr;
 	EventLoop notifyLoop;
 	EventChannel() : notifyLoop(){ }
 	std::unordered_map<std::string, std::vector<Subscriber::Ptr>> _subscribedToTopics;

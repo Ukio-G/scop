@@ -6,6 +6,7 @@
 #include "modules/Resources/TexturesKeeper.hpp"
 #include <cstring>
 #include <filesystem>
+#include "EventChannel.hpp"
 
 #include "TextureParser.hpp"
 
@@ -91,6 +92,7 @@ int main(int argc, char **argv) {
   handleCommandLine(argc, argv, ctx);
 
   w.drawLoop();
+  EventChannel::destroy();
 
   return 0;
 }
