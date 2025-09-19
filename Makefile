@@ -9,10 +9,10 @@ ifeq ($(UNAME_S),Darwin)          # macOS
   SYS_LIBS := -L./deps/lib -framework OpenGL -framework Cocoa
   CXXFLAGS += -DGL_SILENCE_DEPRECATION
 else ifeq ($(UNAME_S),Linux)      # Linux
-  SYS_LIBS := -L./deps/lib
+  SYS_LIBS := -Wl,-rpath,'$$ORIGIN/deps/lib' -Wl,-z,origin -L./deps/lib -lGL
 endif
 
-LD_FLAGS = -Wl,-rpath,'$$ORIGIN/deps/lib' -Wl,-z,origin $(SYS_LIBS) -lGL -lGLEW -lglfw
+LD_FLAGS = $(SYS_LIBS) -lGLEW -lglfw
 
 # Create list of .obj files, based on .c files
 OBJS_DIR = objs
