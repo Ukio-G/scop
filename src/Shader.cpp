@@ -13,9 +13,8 @@ void Shader::loadFromFile(const char *path, GLuint shaderType) {
     shaderSource = new char[bytes_to_source];
 
     int fd = open(path, O_RDONLY);
-
     if (fd < 0)
-        throw std::runtime_error("Error with open file: " + std::string(path));
+        throw std::runtime_error("Error with open shader file: " + std::string(path));
     
     int readed = read(fd, shaderSource, bytes_to_source);
     shaderSource[readed] = 0;

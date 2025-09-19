@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <map>
+#include <memory>
 #include <ranges>
 #include <string>
 #include <variant>
@@ -77,5 +78,7 @@ T &operator<<(T &t, std::variant<std::string, long, double, bool> &v) {
   t = std::get<T>(v);
   return t;
 }
+
+extern std::unique_ptr<config> config_ptr;
 
 #endif // CFG_PARSER_HPP

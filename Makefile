@@ -6,7 +6,7 @@ CXX=clang++
 # Cross platform section
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)          # macOS
-  SYS_LIBS := -L./deps/lib -framework OpenGL -framework Cocoa
+  SYS_LIBS := -L./deps/lib -Wl,-rpath,@executable_path -framework OpenGL -framework Cocoa
   CXXFLAGS += -DGL_SILENCE_DEPRECATION
 else ifeq ($(UNAME_S),Linux)      # Linux
   SYS_LIBS := -Wl,-rpath,'$$ORIGIN/deps/lib' -Wl,-z,origin -L./deps/lib -lGL
@@ -59,6 +59,6 @@ scop: $(OBJS)
 	$(CXX) $(LD_FLAGS) $(CXXFLAGS) $(INCLUDE) $(OBJS) -o $@
 
 clean:
-	rm -rf $(OBJS_DIR)
+	rm -rf $(OBJS_DIR) scop
 
 all: clean scop

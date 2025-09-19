@@ -2,6 +2,7 @@
 #include <cstddef>
 #include "Graphic/Object3D.hpp"
 #include "Graphic/Shader.hpp"
+#include "cfg_parser.hpp"
 #include "math.hpp"
 
 class WireBBoxManager {
@@ -26,8 +27,10 @@ public:
 
     glBindVertexArray(0);
 
-    Shader vs( "../resources/shaders/boundbox_vs.glsl", GL_VERTEX_SHADER );
-    Shader fs( "../resources/shaders/boundbox_fs.glsl", GL_FRAGMENT_SHADER );
+    auto& shaders = config_ptr->sections[ "shaders" ];
+
+    Shader vs( std::get< std::string >( shaders[ "boundbox_vs" ] ).c_str(), GL_VERTEX_SHADER );
+    Shader fs( std::get< std::string >( shaders[ "boundbox_fs" ] ).c_str(), GL_FRAGMENT_SHADER );
 
     m_shaderProgram = std::make_unique< ShaderProgram >( &vs, &fs );
   }

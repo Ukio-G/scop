@@ -6,14 +6,16 @@
 #include "modules/Resources/TexturesKeeper.hpp"
 #include <cstring>
 #include <filesystem>
+#include <memory>
 #include "EventChannel.hpp"
 
 #include "TextureParser.hpp"
 
+std::unique_ptr<config> config_ptr = nullptr;
+
 struct Context {
   GeometryKeeper *geometryKeeper = nullptr;
   Window * window = nullptr;
-  config * cfg = nullptr;
   TexturesKeeper * texturesKeeper = nullptr;
 };
 
@@ -34,54 +36,53 @@ void addToDraw(Context & ctx, const std::string & name, const std::string & file
   ctx.window->addObject3DToDraw(new Object3D(name, geometry, textures));
 }
 
-void handleCommandLine(int argc, char **argv, Context & ctx) {
-  if (strcmp(argv[1], "-c") == 0 && argc == 3) {
-    config cfg(argv[2]);
+void initDrawResources(Context & ctx)
+{
+  auto &cfg = *( config_ptr.get() );
 
-    for (auto&[name, section] : cfg.sections) {
-      if (name == "config")
+  for( auto &[ name, section ] : cfg.sections ) {
+    if( name == "config" )
+      continue;
+    try {
+      if ( !section.contains("render") )
         continue;
-      try {
-        bool is_render = std::get<bool>(section.at("render"));
-        if (!is_render)
-          continue;
 
-        auto model_name = std::get<std::string>(section.at("name"));
-        auto model_path = std::get<std::string>(section.at("file_path"));
-        std::string texture_path;
-        if ( section.contains( "texture" ) )
-        {
-          texture_path = std::get<std::string>(section.at("texture"));
-          std::cout << "Loading texture: " << texture_path << std::endl;
-        }
+      bool is_render = std::get< bool >( section.at( "render" ) );
+      if( !is_render )
+        continue;
 
-        addToDraw(ctx, model_name, model_path, texture_path);
-      } catch (std::invalid_argument &argument) {
-        std::cout << "error handle section - no such section, skip " << name << std::endl;
-      } catch (std::bad_variant_access &bad_variant_access) {
-        std::cout << "error handle section - invalid variant cast, skip " << name << std::endl;
+      auto        model_name = std::get< std::string >( section.at( "name" ) );
+      auto        model_path = std::get< std::string >( section.at( "file_path" ) );
+      std::string texture_path;
+
+      if( section.contains( "texture" ) ) {
+        texture_path = std::get< std::string >( section.at( "texture" ) );
+        std::cout << "Loading texture: " << texture_path << std::endl;
       }
-      catch (std::out_of_range &out_of_range) {
-        std::cout << "error handle section - out_of_range (no such field in section), skip " << name << std::endl;
 
-      }
+      addToDraw( ctx, model_name, model_path, texture_path );
+    } catch( std::invalid_argument &argument ) {
+      std::cout << "error handle section - no such section, skip " << name << std::endl;
+    } catch( std::bad_variant_access &bad_variant_access ) {
+      std::cout << "error handle section - invalid variant cast, skip " << name << std::endl;
+    } catch( std::out_of_range &out_of_range ) {
+      std::cout << "error handle section - out_of_range (no such field in section), skip " << name << std::endl;
     }
-  }
-  else if (argc == 2) {
-    std::string model_path(argv[2]);
-    std::string model_name = std::filesystem::path(model_path).string();
-    addToDraw(ctx, model_name, model_path, "");
-  }
-  else {
-    throw std::runtime_error("invalid launch options");
   }
 }
 
-int main(int argc, char **argv) {
-  Context ctx;
+void handleCommandLine(int argc, char **argv, Context & ctx) {
+  if( strcmp( argv[ 1 ], "-c" ) == 0 && argc == 3 ) {
+    config_ptr = std::make_unique< config >( argv[ 2 ] );
+    auto &cfg  = *( config_ptr.get() );
+  } else {
+    throw std::runtime_error( "invalid launch options" );
+  }
+}
 
-  Window w(1000, 1000);
-  ctx.window = &w;
+int main(int argc, char **argv, char**envp) {
+  Context ctx;
+  handleCommandLine(argc, argv, ctx);
 
   GeometryKeeper g_keeper;
   TexturesKeeper t_keeper;
@@ -89,7 +90,17 @@ int main(int argc, char **argv) {
   ctx.geometryKeeper = &g_keeper;
   ctx.texturesKeeper = &t_keeper;
 
-  handleCommandLine(argc, argv, ctx);
+  auto & windows_settings = config_ptr->sections["window_settings"];
+  
+  long width, height;
+  width  << windows_settings["width"];
+  height << windows_settings["height"];
+  
+  Window w( width, height );
+  ctx.window = &w;
+  w.init();
+
+  initDrawResources(ctx);
 
   w.drawLoop();
   EventChannel::destroy();

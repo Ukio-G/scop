@@ -7,6 +7,7 @@
 #include "IO/ObjectsControls.hpp"
 #include "IO/mouseHandler.hpp"
 #include "Camera.hpp"
+#include "cfg_parser.hpp"
 #include "math.hpp"
 #include "modules/Resources/GeometryKeeper.hpp"
 #include <stdexcept>
@@ -25,6 +26,7 @@ Window::Window() : width( 0 ) , height( 0 ) {
 
 void Window::initGLFW() {
 	// Init GLFW
+  glfwInitHint(GLFW_COCOA_CHDIR_RESOURCES, false);
 	glfwInit();
 	// Set all the required options for GLFW
 	settings.apply();
@@ -52,9 +54,7 @@ void Window::initViewport() {
   glViewport( 0, 0, fbw, fbh );
 }
 
-Window::Window(int width, int height) : width(width), height(height), name("Window") {
-	init();
-}
+Window::Window(int width, int height) : width(width), height(height), name("Window") { }
 
 void Window::passUniforms() {
 	shaderProgram->setMatrix4d("projection", projectionMatrix);
@@ -95,10 +95,12 @@ void Window::drawLoop() {
   projectionMatrix   = glm42::perspective( 0.001f, 1000.0f, 45.0f, aspect_ratio );
   FpsCounter counter;
 
+  bool show_fps    = (config_ptr->sections.contains("render_loop")) ? std::get<bool> (config_ptr->sections["render_loop"]["show_fps"]): false;
+  bool draw_bounds = (config_ptr->sections.contains("draw_bounds")) ? std::get<bool> (config_ptr->sections["render_loop"]["draw_bounds"]): false;
+
   while( !glfwWindowShouldClose( glfwWindow ) ) {
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
 
     keysControls->pollingKeysEvent();
     mouseControls->pollingMouseEvents();
@@ -108,9 +110,12 @@ void Window::drawLoop() {
     shadersControls.update();
 
     draw3DObjects();
-    wbox.draw( camera->viewMatrix, projectionMatrix, **objControls.m_selectedObjectIt );
 
-    counter.frame();
+    if (draw_bounds)
+      wbox.draw( camera->viewMatrix, projectionMatrix, **objControls.m_selectedObjectIt );
+
+    if (show_fps)
+      counter.frame();
 
     glfwSwapBuffers( glfwWindow );
     glfwPollEvents();
@@ -122,9 +127,13 @@ void Window::drawLoop() {
 }
 
 void Window::initShaders() {
-	Shader vs("../resources/shaders/vs.glsl", GL_VERTEX_SHADER);
-	Shader fs("../resources/shaders/fs.glsl", GL_FRAGMENT_SHADER);
-	shaderProgram = new ShaderProgram(&vs, &fs);
+  auto& shaders = config_ptr->sections["shaders"];
+  std::string& vs_str = std::get< std::string > (shaders[ "main_vs" ]);
+  std::string& fs_str = std::get< std::string > (shaders[ "main_fs" ]);
+  Shader vs( vs_str.c_str(), GL_VERTEX_SHADER );
+  Shader fs( fs_str.c_str(), GL_FRAGMENT_SHADER );
+
+  shaderProgram = new ShaderProgram(&vs, &fs);
 
   shaderProgram->use();
   shaderProgram->setInt("diffuseMap", 0);
@@ -161,8 +170,7 @@ Window::NativeWindowType* Window::getNativeWindowPtr() {
 
 void Window::init() {
 	initGLFW();
-	initGLEW();
-
+  initGLEW();
 	initViewport();
 	initShaders();
 	initIO();
