@@ -72,7 +72,7 @@ void initDrawResources(Context & ctx)
 }
 
 void handleCommandLine(int argc, char **argv) {
-  if( strcmp( argv[ 1 ], "-c" ) == 0 && argc == 3 ) {
+  if( argc == 3 && strcmp( argv[ 1 ], "-c" ) == 0 ) {
     config_ptr = std::make_unique< config >( argv[ 2 ] );
   } else {
     throw std::runtime_error( "invalid launch options" );
