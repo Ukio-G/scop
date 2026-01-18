@@ -1,8 +1,6 @@
 #version 330 core
 
 uniform sampler2D diffuseMap;
-uniform vec3 viewPos;
-uniform float u_time;
 uniform int u_hasTexture;
 uniform float u_textureColorLerpFactor;
 uniform bool u_flatShading;
@@ -21,14 +19,14 @@ out vec4 FragColor;
 in vec3 vWorldPos;
 
 vec3 fastNormal(vec3 p) {
-    vec3 dx = dFdx(p);          // производные по экрану
+    vec3 dx = dFdx(p);
     vec3 dy = dFdy(p);
     return normalize(cross(dx, dy));
 }
 
 vec3 sampleTriplanar(vec3 pos, vec3 norm) {
     vec3 n = abs(normalize(norm));
-    n = (n - 0.2) / 0.8;           // небольшое «перо»
+    n = (n - 0.2) / 0.8;
     n = max(n, 0.0);
     n /= dot(n, vec3(1.0));
 
@@ -52,12 +50,7 @@ void main() {
     else
         vertexColor = fs_in.Color;
     
-    if (u_grayscale) {
-        float graylevel = (vertexColor[0] + vertexColor[1] + vertexColor[2]) / 3;
-        vertexColor[0] = graylevel;
-        vertexColor[1] = graylevel;
-        vertexColor[2] = graylevel;
-    }
+    
     vec3 resultColor = vec3(0);
 
     if (u_hasTexture > 0)
@@ -67,6 +60,13 @@ void main() {
     else
     {
         resultColor = vertexColor;
+    }
+
+    if (u_grayscale) {
+        float graylevel = (resultColor[0] + resultColor[1] + resultColor[2]) / 3;
+        resultColor[0] = graylevel;
+        resultColor[1] = graylevel;
+        resultColor[2] = graylevel;
     }
 
     FragColor = vec4(resultColor, 1.0);

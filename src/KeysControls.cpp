@@ -36,3 +36,40 @@ void KeysControls::pollingKeysEvent() {
 		}
 	}
 }
+
+void KeysControls::printControls()
+{
+  std::cout << std::endl << "---------   KEYS   -----------" << std::endl << std::endl;
+
+  std::cout << "Select next object - left" << std::endl;
+  std::cout << "Select prev object - right" << std::endl;
+
+  std::cout << std::endl;
+
+  std::cout << "Remove behaviours from selection object - 0" << std::endl;
+  std::cout << "Spin - 1" << std::endl;
+  std::cout << "Translation - 2" << std::endl;
+
+  std::cout << std::endl;
+
+  std::cout << "X increase - U" << std::endl;
+  std::cout << "X increase - J" << std::endl;
+
+  std::cout << std::endl;
+
+  std::cout << "Y increase - I" << std::endl;
+  std::cout << "Y increase - K" << std::endl;
+
+  std::cout << std::endl;
+
+  std::cout << "Z increase - O" << std::endl;
+  std::cout << "Z increase - L" << std::endl;
+
+  std::cout << std::endl;
+
+  std::cout << "flat/smooth shading - C" << std::endl;
+  std::cout << "texture/colors - T" << std::endl;
+  std::cout << "grayscale - G increase" << std::endl;
+
+  std::cout << std::endl << "---------   KEYS   -----------" << std::endl << std::endl;
+}

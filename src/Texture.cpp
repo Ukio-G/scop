@@ -95,8 +95,8 @@ void Texture::getGLTexture()
   std::cout << "Texture ID: " << id << std::endl;
   parameters.apply();
 
-  const GLint  internal = ( numChannels == 4 ) ? GL_RGBA8 : GL_RGB8;  // корректный internalFormat
-  const GLenum external = ( numChannels == 4 ) ? GL_BGRA : GL_BGR;    // раскладка исходных байт
+  const GLint  internal = ( numChannels == 4 ) ? GL_RGBA8 : GL_RGB8;
+  const GLenum external = ( numChannels == 4 ) ? GL_BGRA : GL_BGR;
 
 
   glTexImage2D( GL_TEXTURE_2D, 0, internal, width, height, 0, external, GL_UNSIGNED_BYTE, data );

@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <fstream>
 
-inline size_t readInt(std::vector<char>& buffer, int offset, int bytes_to_read = 4) {
+inline size_t readInt(std::vector<char>& buffer, int offset, size_t bytes_to_read = 4) {
     size_t result = 0;
 
     for (size_t i = 0; i < bytes_to_read; i++) {
@@ -37,7 +37,6 @@ void TextureParser::loadBMPFromFile(const std::string &fileName) {
     };
 
     int width, height;
-    size_t file_size;
     size_t pixel_data_idx = 0;
 
 
@@ -66,7 +65,6 @@ void TextureParser::loadBMPFromFile(const std::string &fileName) {
     height = readInt(bytes, 22);
 
     size_t bpp = readInt(bytes, 28, 2);
-    size_t pixel_data_size = readInt(bytes, 34);
 
     if (bpp != 32) {
         std::cerr << "Bpp is not 32 - unsupported BMP format" << std::endl;

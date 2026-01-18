@@ -55,7 +55,7 @@ public:
       std::istringstream stream(line);
       stream.ignore(static_cast<long>(pos));
 
-      for (int i = 0; i < N; ++i) {
+      for (size_t i = 0; i < N; ++i) {
         stream >> result[i];
       }
 
@@ -198,17 +198,13 @@ public:
       mesh_indexes.insert(mesh_indexes.end(), indexes.begin(), indexes.end());
     }
   }
+  
+  inline void parseMaterial(const std::string &) {  }
 
-  inline void parseMaterial(const std::string &line) {
+  inline void parseSmooth(const std::string &) {  }
 
-  }
-
-  inline void parseSmooth(const std::string &line) {
-
-  }
-
-  inline void parseGroup(const std::string &line) {
-    throw std::runtime_error("Not supported yet");
+  inline void parseGroup(const std::string &) {
+    throw std::runtime_error("Not supported yet 3");
   }
 
   inline void parseObject(const std::string &line) {
@@ -288,7 +284,7 @@ public:
           std::cout << vtx << std::endl;
 
         std::cout << "Indexes: " << std::endl;
-        for (int i = 0; i < mesh.indexes.size(); i+=3)
+        for (size_t i = 0; i < mesh.indexes.size(); i+=3)
           std::cout << "( " << mesh.indexes[i] << ", " << mesh.indexes[i + 1]  << ", " << mesh.indexes[i + 2]  <<  " )" << std::endl;
 
     }

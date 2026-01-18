@@ -22,6 +22,6 @@ void TexturesKeeper::loadTexturesFromFile(const DescriptionObject3D & descriptio
     }
 }
 
-void TexturesKeeper::loadMaterialFromFile(const std::string & name, const std::string & path) {
+void TexturesKeeper::loadMaterialFromFile(const std::string & /*name*/, const std::string & /*path*/) {
     /* Wait for implement */
 }

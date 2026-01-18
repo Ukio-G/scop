@@ -3,22 +3,17 @@ project(scop)
 
 set(CMAKE_CXX_STANDARD 20)
 
-#–– macOS-специфика ––––––––––––––––––––––––––––––––––––––––––
-# Минимальная версия системы (при необходимости понизьте)
 set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "")
 
-# Подавляем ворнинги об устаревшем OpenGL в Xcode/Clang
 add_compile_definitions(GL_SILENCE_DEPRECATION)
 
 set(CMAKE_C_COMPILER /opt/homebrew/opt/llvm@19/bin/clang)
 set(CMAKE_CXX_COMPILER /opt/homebrew/opt/llvm@19/bin/clang++)
 
-#–– Зависимости ––––––––––––––––––––––––––––––––––––––––––––––
-find_package(OpenGL REQUIRED)          # даёт импорт-таргет OpenGL::GL
-find_package(GLEW   REQUIRED)          # импорт-таргет GLEW::GLEW
-find_package(glfw3  REQUIRED)          # импорт-таргет glfw
+find_package(OpenGL REQUIRED)
+find_package(GLEW   REQUIRED)
+find_package(glfw3  REQUIRED)
 
-#–– Цели ––––––––––––––––––––––––––––––––––––––––––––––––––––––
 set(APP_TARGET scop)
 
 add_executable(${APP_TARGET}
@@ -34,7 +29,6 @@ add_executable(${APP_TARGET}
 
 add_executable(math_tests src/math_test.cpp)
 
-#–– Линковка ––––––––––––––––––––––––––––––––––––––––––––––––––
 target_link_libraries(${APP_TARGET}
     PRIVATE
     GLEW::GLEW        # загружаем расширения OpenGL
@@ -42,7 +36,6 @@ target_link_libraries(${APP_TARGET}
     OpenGL::GL        # системный фреймворк OpenGL
 )
 
-# Путь до библотек и стандартных заголовочных файлов
 target_include_directories(${APP_TARGET} PRIVATE /opt/homebrew/opt/llvm@19/include)
 target_link_directories(${APP_TARGET} PRIVATE /opt/homebrew/opt/llvm@19/lib)
 
@@ -52,7 +45,7 @@ target_link_libraries(math_tests
     glfw              # кроссплатформенное окно/ввод
     OpenGL::GL        # системный фреймворк OpenGL
 )
-#–– Инклуды вашего проекта ––––––––––––––––––––––––––––––––––––
+
 target_include_directories(${APP_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 target_include_directories(${APP_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/)
 target_include_directories(math_tests  PRIVATE ${CMAKE_SOURCE_DIR}/include)

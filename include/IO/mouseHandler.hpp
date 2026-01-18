@@ -90,7 +90,7 @@ private:
 		}
 	}
 
-	void scrollCallback(GLFWwindow* window_, double xoffset, double yoffset) {
+	void scrollCallback(GLFWwindow*, double xoffset, double yoffset) {
 		for (auto &handler: scrollClickHandlers) {
 			handler.second(xoffset, yoffset);
 		}

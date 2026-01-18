@@ -18,6 +18,7 @@ public:
 
 	KeysControls(Window & window);
 	void pollingKeysEvent();
+	void printControls();
 private:
 	Subscriber::Ptr eventSubscriber;
 };

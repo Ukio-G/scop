@@ -96,8 +96,9 @@ void Window::drawLoop() {
   FpsCounter counter;
 
   bool show_fps    = (config_ptr->sections.contains("render_loop")) ? std::get<bool> (config_ptr->sections["render_loop"]["show_fps"]): false;
-  bool draw_bounds = (config_ptr->sections.contains("draw_bounds")) ? std::get<bool> (config_ptr->sections["render_loop"]["draw_bounds"]): false;
+  bool draw_bounds = (config_ptr->sections.contains("render_loop")) ? std::get<bool> (config_ptr->sections["render_loop"]["draw_bounds"]): false;
 
+  std::cout << "draw_bounds: " << draw_bounds << std::endl;
   while( !glfwWindowShouldClose( glfwWindow ) ) {
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -158,9 +159,11 @@ void Window::initIO() {
 	camera = new Camera({2.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f});
 	camera->initMovements();
 
-  EventChannel::getInstance().publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_ESCAPE, [this](Window * window) {
+  EventChannel::getInstance().publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_ESCAPE, [this](Window *) {
       glfwSetWindowShouldClose(glfwWindow, GLFW_TRUE);
   }));
+
+  keysControls->printControls();
 }
 
 Window::NativeWindowType* Window::getNativeWindowPtr() {

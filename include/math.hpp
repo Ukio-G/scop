@@ -20,14 +20,14 @@ namespace glm42 {
       constexpr vec(Args&&... args) : data{static_cast<T>(args)...} {}
 
         vec(const vec &other) {
-            for (int i = 0; i < dim; i++) {
+            for (unsigned int i = 0; i < dim; i++) {
                 data[i] = other.data[i];
             }
         }
 
         vec &operator=(const vec &other) {
           if (this != &other) {
-            for (int i = 0; i < dim; i++) {
+            for (unsigned int i = 0; i < dim; i++) {
               data[i] = other.data[i];
             }
           }
@@ -35,20 +35,20 @@ namespace glm42 {
         }
 
         explicit vec(const vec<T, dim - 1> & other) {
-          for (int i = 0; i < dim - 1; i++) {
+          for (unsigned int i = 0; i < dim - 1; i++) {
             data[i] = other.data[i];
           }
           data[dim - 1] = 0;
         }
 
         explicit vec(T item) {
-            for (int i = 0; i < dim; i++) {
+            for (unsigned int i = 0; i < dim; i++) {
                 data[i] = item;
             }
         }
 
         vec(const vec<T, dim - 1> &other, T last_item) {
-            for (int i = 0; i < dim - 1; i++) {
+            for (unsigned int i = 0; i < dim - 1; i++) {
                 data[i] = other.data[i];
             }
             data[dim] = last_item;
@@ -56,7 +56,7 @@ namespace glm42 {
 
 
         vec() {
-            for (int i = 0; i < dim; i++) {
+            for (unsigned int i = 0; i < dim; i++) {
                 data[i] = static_cast<T>(0);
             }
         }
@@ -71,7 +71,7 @@ namespace glm42 {
         }
 
         bool operator==(const vec<T, dim>& other) {
-          for (int i = 0; i < dim; ++i) {
+          for (unsigned int i = 0; i < dim; ++i) {
             if (data[i] != other.data[i])
               return false;
           }
@@ -138,14 +138,14 @@ namespace glm42 {
 
     template<class T, size_t dim>
     vec<T, dim> operator+(vec<T, dim> lhs, vec<T, dim> rhs) {
-      for (int i = 0; i < dim; i++)
+      for (unsigned int i = 0; i < dim; i++)
         lhs[i] += rhs[i];
       return lhs;
     }
 
     template<class T, size_t dim>
     vec<T, dim> operator-(vec<T, dim> lhs, vec<T, dim> rhs) {
-      for (int i = 0; i < dim; i++)
+      for (unsigned int i = 0; i < dim; i++)
         lhs[i] -= rhs[i];
       return lhs;
     }
@@ -155,16 +155,16 @@ namespace glm42 {
         using vec_type = vec<T, dim>;
 
         mat(const mat &other) {
-            for (int col = 0; col < dim; col++) {
-                for (int row = 0; row < dim; row++) {
+            for (unsigned int col = 0; col < dim; col++) {
+                for (unsigned int row = 0; row < dim; row++) {
                     data[col][row] = other.data[col][row];
                 }
             }
         }
 
         explicit mat(T item) {
-            for (int col = 0; col < dim; col++) {
-                for (int row = 0; row < dim; row++) {
+            for (unsigned int col = 0; col < dim; col++) {
+                for (unsigned int row = 0; row < dim; row++) {
                     data[col][row] = item;
                 }
             }
@@ -174,8 +174,8 @@ namespace glm42 {
             if (this == &other)
                 return *this;
 
-            for (int col = 0; col < dim; col++) {
-                for (int row = 0; row < dim; row++) {
+            for (unsigned int col = 0; col < dim; col++) {
+                for (unsigned int row = 0; row < dim; row++) {
                     data[col][row] = other.data[col][row];
                 }
             }
@@ -194,9 +194,9 @@ namespace glm42 {
 
         mat<T, dim> operator*(const mat<T, dim> &other) const {
             mat<T, dim> result;
-            for (int col = 0; col < dim; ++col) {
-              for (int row = 0; row < dim; ++row) {
-                for (int k = 0; k < dim; ++k) {
+            for (unsigned int col = 0; col < dim; ++col) {
+              for (unsigned int row = 0; row < dim; ++row) {
+                for (unsigned int k = 0; k < dim; ++k) {
                   result.data[col][row] += data[k][row] * other.data[col][k];
                 }
               }
@@ -207,8 +207,8 @@ namespace glm42 {
 
         vec<T, dim> operator*(const vec<T, dim> &other) const {
             vec<T, dim> result(0);
-            for (int row = 0; row < dim; row++) {
-                for (int k = 0; k < dim; k++) {
+            for (unsigned int row = 0; row < dim; row++) {
+                for (unsigned int k = 0; k < dim; k++) {
                     result.data[row] += data[k][row] * other.data[k];
                 }
             }
@@ -218,8 +218,8 @@ namespace glm42 {
 
         mat<T, dim> operator*(const T number) const {
             mat<T, dim> result;
-            for (int col = 0; col < dim; col++) {
-                for (int row = 0; row < dim; row++) {
+            for (unsigned int col = 0; col < dim; col++) {
+                for (unsigned int row = 0; row < dim; row++) {
                     result.data[col][row] = data[col][row] * number;
                 }
             }
@@ -229,8 +229,8 @@ namespace glm42 {
 
         mat<T, dim> operator+(const mat<T, dim> &other) const {
             mat<T, dim> result;
-            for (int col = 0; col < dim; col++) {
-                for (int row = 0; row < dim; row++) {
+            for (unsigned int col = 0; col < dim; col++) {
+                for (unsigned int row = 0; row < dim; row++) {
                     result.data[col][row] = data[col][row] + other.data[col][row];
                 }
             }
@@ -241,7 +241,7 @@ namespace glm42 {
 
         static mat<T, dim> diag(T item) {
             mat<T, dim> result;
-            for (int i = 0; i < dim; ++i) {
+            for (unsigned int i = 0; i < dim; ++i) {
                 result.data[i][i] = item;
             }
             return result;

@@ -8,20 +8,20 @@ void ObjectsControls::initControls() {
 
     auto& eventChannel = EventChannel::getInstance();
 
-    eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_1, [this](Window * window) {
+    eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_1, [this](Window *) {
       selectedTag = std::in_place_type<Behaviours::Spin>;
     }));
 
-    eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_2, [this](Window * window) {
+    eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_2, [this](Window *) {
       selectedTag = std::in_place_type<Behaviours::Translation>;
     }));
 
-    eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_0, [this](Window * window) {
+    eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_0, [this](Window *) {
       m_behaviours.removeBehaviourFromObject(*m_selectedObjectIt);
     }));
 
 
-    eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_LEFT, [this](Window * window) {
+    eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_LEFT, [this](Window *) {
       if (m_selectedObjectIt == m_objects3d.begin()) {
         m_selectedObjectIt = m_objects3d.end() - 1;
       } else {
@@ -29,7 +29,7 @@ void ObjectsControls::initControls() {
       }
     }));
 
-    eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_RIGHT, [this](Window * window) {
+    eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_RIGHT, [this](Window *) {
       m_selectedObjectIt++;
       if (m_selectedObjectIt == m_objects3d.end())
         m_selectedObjectIt = m_objects3d.begin();
@@ -44,7 +44,7 @@ void ObjectsControls::initControls() {
       };
 
       return std::make_pair< int, std::function< void( Window * window ) > >(
-          std::move( key ), [ addBehaviour, delta ]( Window* window ) { addBehaviour( delta ); } );
+          std::move( key ), [ addBehaviour, delta ]( Window* ) { addBehaviour( delta ); } );
     };
 
     // X

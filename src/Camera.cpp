@@ -15,7 +15,7 @@ Camera::Camera(const glm42::vec3 &pos, const glm42::vec3 &rotation): position(po
   viewMatrix = glm42::lookAt(position, glm42::normalize(pos + front), glm42::normalize(up));
 }
 
-void Camera::update(double x, double y, double dx, double dy) noexcept {
+void Camera::update(double, double, double dx, double dy) noexcept {
 		if (!movementActive)
 			return;
 
@@ -54,36 +54,36 @@ void Camera::initMovements() noexcept {
 	float cameraSpeed = 4.f;
 	auto & eventChannel = EventChannel::getInstance();
 
-	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_W, [&, cameraSpeed](Window * window) {
+	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_W, [&, cameraSpeed](Window *) {
 		position = position + (front * cameraSpeed * dt);
-    dirtyFlag = true;
+    	dirtyFlag = true;
 	}));
 
-	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_S, [&, cameraSpeed](Window * window) {
+	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_S, [&, cameraSpeed](Window *) {
 		position = position - (front * cameraSpeed * dt);
-    dirtyFlag = true;
+    	dirtyFlag = true;
 	}));
 
-	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_A, [&, cameraSpeed](Window * window) {
+	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_A, [&, cameraSpeed](Window *) {
 		position = position - (right * cameraSpeed * dt);
-    dirtyFlag = true;
+    	dirtyFlag = true;
 	}));
 
-	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_D, [&, cameraSpeed](Window * window) {
+	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_D, [&, cameraSpeed](Window *) {
 		position = position + (right * cameraSpeed * dt);
-    dirtyFlag = true;
+    	dirtyFlag = true;
 	}));
 
-	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_LEFT_ALT, [&, cameraSpeed](Window * window) {
+	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_LEFT_ALT, [&, cameraSpeed](Window* window) {
 		movementActive = false;
 		glfwSetInputMode(window->getNativeWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
-    dirtyFlag = true;
+    	dirtyFlag = true;
 	}));
 
-	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_RIGHT_ALT, [&, cameraSpeed](Window * window) {
+	eventChannel.publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_RIGHT_ALT, [&, cameraSpeed](Window* window) {
 		movementActive = true;
 		glfwSetInputMode(window->getNativeWindowPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    dirtyFlag = true;
+    	dirtyFlag = true;
 	}));
 
 	eventChannel.publish("NewMouseEvent", 

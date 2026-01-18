@@ -36,41 +36,4 @@ inline std::ostream& operator<<(std::ostream& out, const DescriptionObject3D& ob
   return out;
 }
 
-/*
-using json = nlohmann::json;
-
-inline void from_json(const nlohmann::json &j, DescriptionObject3D &obj) {
-  j.at("name").get_to(obj.name);
-  j.at("model").get_to(obj.modelPath);
-
-  if (j.contains("diffuse")) {
-    obj.diffusePath = j.at("diffuse");
-  }
-
-  if (j.contains("specular")) {
-    obj.specularPath = j.at("specular");
-  }
-
-  if (j.contains("normal")) {
-    obj.normalPath = j.at("normal");
-  }
-
-  if (j.contains("material")) {
-    obj.mtlPath = j.at("material");
-  }
-
-  if (j.contains("translation")) {
-    obj.translate = {j["translation"][0], j["translation"][1], j["translation"][2]};
-  }
-
-  if (j.contains("scale")) {
-    obj.scale = {j["scale"][0], j["scale"][1], j["scale"][2]};
-  }
-
-  if (j.contains("rotate")) {
-    obj.rotate = {j["rotate"][0], j["rotate"][1], j["rotate"][2]};
-  }
-}
-*/
-
 #endif //!__DESCRIPTIONOBJECT3D__H__

@@ -71,18 +71,17 @@ void initDrawResources(Context & ctx)
   }
 }
 
-void handleCommandLine(int argc, char **argv, Context & ctx) {
+void handleCommandLine(int argc, char **argv) {
   if( strcmp( argv[ 1 ], "-c" ) == 0 && argc == 3 ) {
     config_ptr = std::make_unique< config >( argv[ 2 ] );
-    auto &cfg  = *( config_ptr.get() );
   } else {
     throw std::runtime_error( "invalid launch options" );
   }
 }
 
-int main(int argc, char **argv, char**envp) {
+int main(int argc, char **argv) {
   Context ctx;
-  handleCommandLine(argc, argv, ctx);
+  handleCommandLine(argc, argv);
 
   GeometryKeeper g_keeper;
   TexturesKeeper t_keeper;
