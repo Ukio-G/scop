@@ -73,16 +73,34 @@ void initDrawResources(Context & ctx)
 
 void handleCommandLine(int argc, char **argv) {
   if( argc == 3 && strcmp( argv[ 1 ], "-c" ) == 0 ) {
+
+    if ( !std::filesystem::exists(argv[ 2 ]) )
+    {
+      throw std::runtime_error( "Invalid config file. File not exist" );
+    }
+    
+    if ( std::filesystem::path(argv[ 2 ]).extension() == ".cfg" )
+    {
+      throw std::runtime_error( "Invalid config file. File not .cfg" );
+    }
+
     config_ptr = std::make_unique< config >( argv[ 2 ] );
-  } else {
-    throw std::runtime_error( "invalid launch options" );
+  } 
+  else 
+  {
+    throw std::runtime_error( "Invalid launch options. Expected: scop -c <config>" );
   }
 }
 
 int main(int argc, char **argv) {
   Context ctx;
-  handleCommandLine(argc, argv);
-
+  try {
+    handleCommandLine(argc, argv);
+  }
+  catch (std::exception& e) {
+    std::cerr << e.what() << std::endl;
+    exit(1);
+  }
   GeometryKeeper g_keeper;
   TexturesKeeper t_keeper;
 
