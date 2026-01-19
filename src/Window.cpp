@@ -112,7 +112,7 @@ void Window::drawLoop() {
 
     draw3DObjects();
 
-    if (draw_bounds)
+    if (!objects3d.empty() && draw_bounds)
       wbox.draw( camera->viewMatrix, projectionMatrix, **objControls.m_selectedObjectIt );
 
     if (show_fps)

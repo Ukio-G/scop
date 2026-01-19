@@ -17,7 +17,8 @@ void ObjectsControls::initControls() {
     }));
 
     eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_0, [this](Window *) {
-      m_behaviours.removeBehaviourFromObject(*m_selectedObjectIt);
+      if (!m_objects3d.empty())
+        m_behaviours.removeBehaviourFromObject(*m_selectedObjectIt);
     }));
 
 
@@ -38,6 +39,9 @@ void ObjectsControls::initControls() {
     auto addKeyBinding = [ this ]( int key, glm42::vec3 delta ) {
       auto addBehaviour = [ this ]( const glm42::vec3& delta ) {
         std::visit( [ this, delta ]( auto tag ) {
+              if (m_objects3d.empty())
+                return;
+
               TransformationBehaviours::BehaviourVariant v{ tag, delta };
               m_behaviours.addBehaviourToObject( *m_selectedObjectIt, std::move( v ) );
             }, selectedTag );

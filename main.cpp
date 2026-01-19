@@ -79,7 +79,7 @@ void handleCommandLine(int argc, char **argv) {
       throw std::runtime_error( "Invalid config file. File not exist" );
     }
     
-    if ( std::filesystem::path(argv[ 2 ]).extension() == ".cfg" )
+    if ( std::filesystem::path(argv[ 2 ]).extension() != ".cfg" )
     {
       throw std::runtime_error( "Invalid config file. File not .cfg" );
     }
