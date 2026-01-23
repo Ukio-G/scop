@@ -12,10 +12,17 @@ public:
 	using EventType = EMouseEvent;
 	using ActionType = std::any;
 
-	std::map<size_t, std::function<void(double /* x */, double /* y */)>> leftClickHandlers;
-	std::map<size_t, std::function<void(double /* x */, double /* y */)>> rightClickHandlers;
-	std::map<size_t, std::function<void(double /* x offset */, double /* y offset */)>> scrollClickHandlers;
-	std::map<size_t, std::function<void(double /* x */, double /* y */, double /* dx */, double /* dy */)>> moveClickHandlers;
+  enum class Button : uint8_t { Left, Right, Middle, Count };
+  enum class Phase  : uint8_t { Down, Pressed, Released, Count };
+
+  using MouseButtonHandler = std::function<void(double, double)>;
+  using MouseScrollHandler = std::function<void(double, double)>;
+  using MouseMoveHandler = std::function<void(double, double, double, double)>;
+
+	std::map<size_t, MouseButtonHandler> leftClickHandlers;
+	std::map<size_t, MouseButtonHandler> rightClickHandlers;
+	std::map<size_t, MouseScrollHandler> scrollHandlers;
+	std::map<size_t, MouseMoveHandler> moveHandlers;
 
 	MouseControls(Window & window) : window (&window) {
 		glfwWindow = window.getNativeWindowPtr();
@@ -36,7 +43,10 @@ public:
 	}
 
 	void pollingMouseEvents() {
-		bool leftBtnPressed = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
+	  static bool prevLeftBtnPressed = false;
+	  static bool prevRightBtnPressed = false;
+
+	  bool leftBtnPressed = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 		bool rightBtnPressed = glfwGetMouseButton(glfwWindow, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS;
 
 		double pos[2] {};
@@ -49,18 +59,21 @@ public:
 			prev_pos[i] = pos[i];
 		}
 
-		if (leftBtnPressed) {
+		if (leftBtnPressed && !prevLeftBtnPressed) {
 			for (auto &handler: leftClickHandlers)
 				handler.second(pos[0], pos[1]);
 		}
 
-		if (rightBtnPressed) {
+		if (rightBtnPressed && !prevRightBtnPressed) {
 			for (auto &handler: rightClickHandlers)
 				handler.second(pos[0], pos[1]);
 		}
 
-		for (auto &handler: moveClickHandlers)
+		for (auto &handler: moveHandlers)
 			handler.second(pos[0], pos[1], delta_pos[0], delta_pos[1]);
+
+	  prevLeftBtnPressed = leftBtnPressed;
+	  prevRightBtnPressed = rightBtnPressed;
 	}
 private:
 	Window * window;
@@ -85,13 +98,13 @@ private:
 			}
 				break;
 			case EME_MOVE:
-				moveClickHandlers[moveClickHandlers.size()] = std::any_cast<std::function<void(double, double, double, double)>>(action);
+				moveHandlers[moveHandlers.size()] = std::any_cast<std::function<void(double, double, double, double)>>(action);
 				break;
 		}
 	}
 
 	void scrollCallback(GLFWwindow*, double xoffset, double yoffset) {
-		for (auto &handler: scrollClickHandlers) {
+		for (auto &handler: scrollHandlers) {
 			handler.second(xoffset, yoffset);
 		}
 	}

@@ -20,6 +20,7 @@
 #include "FPSCounter.hpp"
 #include "include/TransformBehaviour/TransformBehaviour.hpp"
 #include "include/IO/ShadersControls.hpp"
+#include "include/Debug3DLine.hpp"
 
 Window::Window() : width( 0 ) , height( 0 ) {
 }
@@ -74,6 +75,23 @@ void Window::draw3DObjects() {
 	}
 }
 
+void helper_lines(std::vector<Debug3DLine> & lines)
+{
+  lines.emplace_back( glm42::vec3{0.0f, 0.0f, 0.0f}, glm42::vec3{1.0f, 0.0f, 0.0f}, glm42::vec3{1.0f, 0.0f, 0.0f} );
+  lines.emplace_back( glm42::vec3{0.0f, 0.0f, 0.0f}, glm42::vec3{0.0f, 1.0f, 0.0f}, glm42::vec3{0.0f, 1.0f, 0.0f} );
+  lines.emplace_back( glm42::vec3{0.0f, 0.0f, 0.0f}, glm42::vec3{0.0f, 0.0f, 1.0f}, glm42::vec3{0.0f, 0.0f, 1.0f} );
+
+  for(int z = -10; z < 10; z++)
+  {
+    lines.emplace_back(glm42::vec3{-10.0f, 0.0f, z}, glm42::vec3{10.0f, 0.0f, z}, glm42::vec3{.5f, .5f, .5f});
+  }
+
+  for(int x = -10; x < 10; x++)
+  {
+    lines.emplace_back(glm42::vec3{x, 0.0f, -10.f}, glm42::vec3{x, 0.0f, 10.f}, glm42::vec3{.5f, .5f, .5f});
+  }
+}
+
 void Window::drawLoop() {
   WireBBoxManager          wbox;
   TransformationBehaviours behaviours;
@@ -98,7 +116,46 @@ void Window::drawLoop() {
   bool show_fps    = (config_ptr->sections.contains("render_loop")) ? std::get<bool> (config_ptr->sections["render_loop"]["show_fps"]): false;
   bool draw_bounds = (config_ptr->sections.contains("render_loop")) ? std::get<bool> (config_ptr->sections["render_loop"]["draw_bounds"]): false;
 
-  std::cout << "draw_bounds: " << draw_bounds << std::endl;
+  std::vector<Debug3DLine> lines;
+  lines.reserve(100);
+
+  EventChannel::getInstance().publish("NewMouseEvent",
+  std::make_pair<EMouseEvent, std::any>(
+    EME_CLICK_LEFT,
+    std::function<void(double, double)> ([&](double x, double y)
+    {
+      glm42::vec3 begin = camera->position;
+      glm42::vec3 end = camera->position + camera->front * 10;
+
+      std::cout << x << " " << y << std::endl;
+
+      lines.emplace_back( begin, end );
+      std::cout << lines.size() << " lines" << std::endl;
+    })));
+
+  helper_lines(lines);
+
+  EventChannel::getInstance().publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_P, [&](Window *) {
+    auto mtx = projectionMatrix * camera->viewMatrix;
+    auto w = 0.0f;
+
+    auto tl = mtx * glm42::vec4(-1.f, 1.f, -1.f, w);
+    auto tr = mtx * glm42::vec4(1.f, 1.f, -1.f, w);
+    auto bl = mtx * glm42::vec4(-1.f, -1.f, -1.f, w);
+    auto br = mtx * glm42::vec4(1.f, -1.f, -1.f, w);
+
+    auto tlf = mtx * glm42::vec4(-1.f, 1.f, 1.f, w);
+    auto trf = mtx * glm42::vec4(1.f, 1.f, 1.f, w);
+    auto blf = mtx * glm42::vec4(-1.f, -1.f, 1.f, w);
+    auto brf =  mtx * glm42::vec4(1.f, -1.f, 1.f, w);
+
+    lines.emplace_back( tl.reduce(), tlf.reduce() );
+    lines.emplace_back( tr.reduce(), trf.reduce() );
+    lines.emplace_back( bl.reduce(), blf.reduce() );
+    lines.emplace_back( br.reduce(), brf.reduce() );
+  }));
+
+
   while( !glfwWindowShouldClose( glfwWindow ) ) {
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
@@ -117,6 +174,9 @@ void Window::drawLoop() {
 
     if (show_fps)
       counter.frame();
+
+    for(auto& line: lines)
+      line.draw( camera->viewMatrix, projectionMatrix );
 
     glfwSwapBuffers( glfwWindow );
     glfwPollEvents();
