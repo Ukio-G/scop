@@ -1,5 +1,5 @@
 .PHONY: all clean
-CXXFLAGS = -std=c++20 -O3 -Wextra -Wall -Werror
+CXXFLAGS = -std=c++20 -O3 # -Wextra -Wall -Werror
 INCLUDE = -I. -Imodules/GLWindow -Imodules/Resources -Iinclude -Iinclude/Graphic -Iinclude/IO -Iinclude/ModuleDispatcher -I./deps/include
 CXX=g++
 
@@ -60,12 +60,11 @@ include/TransformBehaviour/TransformBehaviour.hpp \
 include/Vertex.hpp \
 include/cfg_parser.hpp \
 include/math.hpp \
-include/objLoader.hpp \
+include/Debug3DLine.hpp \
 modules/Resources/DescriptionObject3D.hpp \
 modules/Resources/GeometryKeeper.hpp \
 modules/Resources/ResourcesModule.hpp \
 modules/Resources/TexturesKeeper.hpp
-
 OBJS = $(addprefix $(OBJS_DIR)/, $(patsubst %.cpp, %.o, $(notdir $(SRCS))))
 
 $(addprefix $(OBJS_DIR)/,%.o): $(addprefix src/, $(notdir %.cpp)) $(HEADERS)
