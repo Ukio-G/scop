@@ -7,17 +7,15 @@
 #include <iostream>
 #include <random>
 #include <sstream>
-
 #include "math.hpp"
 
 constexpr bool show_passed_results = false;
+constexpr double eps = 0.01;
 
 bool operator==(const glm42::mat4& lhs, const glm::mat4& rhs) {
-  constexpr float epsilon = 0.001f;
-
   for (int col = 0; col < 4; ++col) {
     for (int row = 0; row < 4; ++row) {
-      if (std::abs(lhs.data[col][row] - rhs[col][row]) > epsilon) {
+      if (std::abs(lhs.data[col][row] - rhs[col][row]) > eps) {
         return false;
       }
     }
@@ -35,10 +33,11 @@ void print_matrix(const glm::mat4& m) {
   }
 }
 
-void print_matrix(const glm42::mat4& m) {
+template <typename T, size_t Dim>
+void print_matrix(const glm42::mat<T, Dim>& m) {
   std::cout << "My Matrix:\n";
-  for (int row = 0; row < 4; ++row) {
-    for (int col = 0; col < 4; ++col) {
+  for (int row = 0; row < Dim; ++row) {
+    for (int col = 0; col < Dim; ++col) {
       std::cout << std::setw(10) << std::setprecision(4) << m.data[col][row] << ' ';
     }
     std::cout << '\n';
@@ -52,6 +51,12 @@ void fill_random(glm::mat4& mat, std::mt19937& rng, std::uniform_real_distributi
       mat[col][row] = dist(rng);
 }
 
+void fill_random(glm42::mat4& mat, std::mt19937& rng, std::uniform_real_distribution<float>& dist) {
+  for (int col = 0; col < 4; ++col)
+    for (int row = 0; row < 4; ++row)
+      mat.at(col,row) = dist(rng);
+}
+
 glm42::mat4 to_my_mat(const glm::mat4& gmat) {
   glm42::mat4 result;
   for (int col = 0; col < 4; ++col)
@@ -60,6 +65,25 @@ glm42::mat4 to_my_mat(const glm::mat4& gmat) {
   return result;
 }
 
+glm::mat4 random_matrix(int seed) {
+  std::mt19937 rng(seed);
+  std::uniform_real_distribution<float> dist(-10.0f, 10.0f);
+
+  glm::mat4 result;
+  fill_random(result, rng, dist);
+
+  return result;
+}
+
+glm42::mat4 random_matrix_42(int seed = 42) {
+  std::mt19937 rng(seed);
+  std::uniform_real_distribution<float> dist(-10.0f, 10.0f);
+
+  glm42::mat4 result;
+  fill_random(result, rng, dist);
+
+  return result;
+}
 
 void test_random_matrix_multiplication(int seed = 42) {
   std::mt19937 rng(seed);
@@ -158,6 +182,43 @@ inline float to_radians(float angle) {
   return M_PI * angle / 180.f;
 }
 
+void minor_test()
+{
+  glm42::mat4 mtx = random_matrix_42();
+
+  print_matrix(mtx);
+
+  for(size_t i = 0; i < 4; i++){
+    for(size_t j = 0; j < 4; j++){
+      std::cout << "Minor " << i << " " << j << std::endl;
+      glm42::mat3 minor = mtx.minor(i, j);
+      print_matrix(minor);
+    }
+  }
+}
+
+void determinant_test(int i)
+{
+  glm::mat4 mtx = random_matrix(i);
+  glm42::mat4 my_mtx = to_my_mat(mtx);
+
+  if (mtx != my_mtx)
+  {
+    print_matrix(mtx);
+    print_matrix(my_mtx);
+    throw std::runtime_error("Matrix compare before determinant computating failed");
+  }
+
+  double my_det = my_mtx.det();
+  double glm_det = glm::determinant(mtx);
+
+  if ( std::abs(my_det - glm_det) > eps )
+  {
+    std::cout << my_det << " " << glm_det << std::endl;
+    throw std::runtime_error("Determinant test failed. delta: " + std::to_string(std::abs(my_det - glm_det)) );
+  }
+}
+
 int main()
 {
 
@@ -198,6 +259,11 @@ int main()
   translate_test(21, 11, 31);
   std::cout << "Translation test 6 passed" << std::endl;
 
+  minor_test();
 
+  for (int i = 0 ; i < 10; i++) {
+    determinant_test(i);
+    std::cout << "Determinant test " << i << " passed" << std::endl;
+  }
   return 0;
 }

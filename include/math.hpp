@@ -183,6 +183,61 @@ namespace glm42 {
             return *this;
         }
 
+        T det() {
+          if constexpr( dim == 2 ) {
+            return data[ 0 ][ 0 ] * data[ 1 ][ 1 ] - data[ 0 ][ 1 ] * data[ 1 ][ 0 ];
+          }
+
+          if constexpr ( dim > 2 ) {
+            auto sign = []( size_t col, size_t row )
+            {
+              if( ( col + row ) % 2 == 0 )
+                return 1;
+              return -1;
+            };
+
+            T      result = static_cast< T >( 0 );
+            size_t row    = 0;
+
+            for( int col = 0; col < dim; col++ )
+            {
+              glm42::mat< T, dim - 1 > m = minor( col, row );
+              T d = m.det();
+              result += d * sign( col, row ) * data[ col ][ row ];
+            }
+
+            return result;
+          }
+        }
+
+        T minor( size_t col, size_t row ) requires( dim == 2 ) {
+          for( size_t i = 0; i < dim; i++ ) {
+            for( size_t j = 0; j < dim; j++ ) {
+              if( col == i || row == j )
+                continue;
+              return data[ i - ( col < i ) ][ j - ( row < j ) ] = data[ i ][ j ];
+            }
+          }
+        }
+
+        mat< T, dim - 1 > minor( size_t col, size_t row ) requires( dim > 2 ) {
+          mat< T, dim - 1 > result;
+
+          for( size_t i = 0; i < dim; i++ ) {
+            for( size_t j = 0; j < dim; j++ ) {
+              if( col == i || row == j )
+                continue;
+              result.data[ i - ( col < i ) ][ j - ( row < j ) ] = data[ i ][ j ];
+            }
+          }
+
+          return result;
+        }
+
+        mat<T, dim> reverse() {
+
+        }
+
         mat() {
             *this = mat(static_cast<T>(0));
         }
