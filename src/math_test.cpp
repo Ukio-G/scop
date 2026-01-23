@@ -178,6 +178,32 @@ void translate_test(float x, float y, float z)
   }
 }
 
+void inverse_matrix_test(int seed = 42)
+{
+  std::mt19937 rng(seed);
+  std::uniform_real_distribution<float> dist(-10.0f, 10.0f);
+
+  glm::mat4 a;
+  fill_random(a, rng, dist);
+  glm42::mat4 my_a = to_my_mat(a);
+
+
+  if (my_a != a)
+    throw std::runtime_error("Matrix compare before inverse test failed");
+
+  auto a_inverse = glm::inverse( a );
+  auto my_a_inverse = my_a.reverse();
+
+  for(int i = 0; i < 4; i++)
+    for(int j = 0; j < 4; j++)
+    {
+      if ((a_inverse[i][j] - my_a_inverse.data[i][j]) > eps)
+      {
+      throw std::runtime_error("Inverse matrix test failed");
+      }
+    }
+}
+
 inline float to_radians(float angle) {
   return M_PI * angle / 180.f;
 }
@@ -264,6 +290,11 @@ int main()
   for (int i = 0 ; i < 10; i++) {
     determinant_test(i);
     std::cout << "Determinant test " << i << " passed" << std::endl;
+  }
+
+  for (int i = 0 ; i < 10; i++) {
+    inverse_matrix_test(i);
+    std::cout << "Inverse test " << i << " passed" << std::endl;
   }
   return 0;
 }

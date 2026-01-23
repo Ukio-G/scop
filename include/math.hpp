@@ -34,6 +34,16 @@ namespace glm42 {
           return *this;
         }
 
+        glm42::vec<T, dim - 1> reduce()
+        {
+          glm42::vec<T, dim - 1> result;
+          for( unsigned int i = 0; i < dim; i++ )
+          {
+            result.data[ i ] = data[ i ];
+          }
+          return result;
+        }
+
         explicit vec(const vec<T, dim - 1> & other) {
           for (unsigned int i = 0; i < dim - 1; i++) {
             data[i] = other.data[i];
@@ -235,7 +245,17 @@ namespace glm42 {
         }
 
         mat<T, dim> reverse() {
-
+          mat<T, dim> result;
+          auto reverse_det = 1.f / det();
+          for( size_t col = 0; col < dim; col++)
+          {
+            for( size_t row = 0; row < dim; row++)
+            {
+              auto cofactor = std::pow(-1, minor( col, row ).det());
+              result.data[col][row] = cofactor * reverse_det;
+            }
+          }
+          return result;
         }
 
         mat() {
