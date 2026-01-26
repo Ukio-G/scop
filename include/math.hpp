@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <glm/ext/matrix_float4x4.hpp>
 #include <iostream>
 #include <optional>
 #include <ostream>
@@ -37,7 +38,7 @@ namespace glm42 {
         glm42::vec<T, dim - 1> reduce()
         {
           glm42::vec<T, dim - 1> result;
-          for( unsigned int i = 0; i < dim; i++ )
+          for( unsigned int i = 0; i < dim - 1; i++ )
           {
             result.data[ i ] = data[ i ];
           }
@@ -211,7 +212,7 @@ namespace glm42 {
 
             for( int col = 0; col < dim; col++ )
             {
-              glm42::mat< T, dim - 1 > m = minor( col, row );
+              glm42::mat< T, dim - 1 > m = minor_matrix( col, row );
               T d = m.det();
               result += d * sign( col, row ) * data[ col ][ row ];
             }
@@ -220,17 +221,7 @@ namespace glm42 {
           }
         }
 
-        T minor( size_t col, size_t row ) requires( dim == 2 ) {
-          for( size_t i = 0; i < dim; i++ ) {
-            for( size_t j = 0; j < dim; j++ ) {
-              if( col == i || row == j )
-                continue;
-              return data[ i - ( col < i ) ][ j - ( row < j ) ] = data[ i ][ j ];
-            }
-          }
-        }
-
-        mat< T, dim - 1 > minor( size_t col, size_t row ) requires( dim > 2 ) {
+        mat< T, dim - 1 > minor_matrix( size_t col, size_t row ) requires( dim > 2 ) {
           mat< T, dim - 1 > result;
 
           for( size_t i = 0; i < dim; i++ ) {
@@ -244,6 +235,18 @@ namespace glm42 {
           return result;
         }
 
+        T minor( size_t col, size_t row )
+        {
+          if constexpr( dim == 2 )
+          {
+
+          }
+          else
+          {
+
+          }
+        }
+
         mat<T, dim> reverse() {
           mat<T, dim> result;
           auto reverse_det = 1.f / det();
@@ -251,7 +254,7 @@ namespace glm42 {
           {
             for( size_t row = 0; row < dim; row++)
             {
-              auto cofactor = std::pow(-1, minor( col, row ).det());
+              auto cofactor = std::pow(-1, minor_matrix( col, row ).det());
               result.data[col][row] = cofactor * reverse_det;
             }
           }
@@ -579,5 +582,30 @@ namespace glm42 {
   };
 
   }
+
+inline glm42::mat4 to_my_mat(const glm::mat4& gmat) {
+  glm42::mat4 result;
+  for (int col = 0; col < 4; ++col)
+    for (int row = 0; row < 4; ++row)
+      result.data[col][row] = gmat[col][row];
+  return result;
+}
+
+
+inline glm::mat4 to_glm_mat(const glm42::mat4& gmat) {
+  glm::mat4 result;
+  for (int col = 0; col < 4; ++col)
+    for (int row = 0; row < 4; ++row)
+      result[col][row] = gmat.data[col][row];
+  return result;
+}
+
+inline glm42::mat4 reverse(const glm42::mat4 mat)
+{
+  auto gmat = glm::inverse( to_glm_mat( mat ) );
+
+  return to_my_mat( gmat );
+}
+
 
 #endif

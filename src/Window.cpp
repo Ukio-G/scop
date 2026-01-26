@@ -21,7 +21,8 @@
 #include "include/TransformBehaviour/TransformBehaviour.hpp"
 #include "include/IO/ShadersControls.hpp"
 #include "include/Debug3DLine.hpp"
-
+#include <glm/mat4x4.hpp>
+#include <glm/gtc/type_ptr.hpp>
 Window::Window() : width( 0 ) , height( 0 ) {
 }
 
@@ -110,14 +111,15 @@ void Window::drawLoop() {
   glEnable( GL_CULL_FACE );
 
   float aspect_ratio = static_cast< float >( width ) / static_cast< float >( height );
-  projectionMatrix   = glm42::perspective( 0.001f, 1000.0f, 45.0f, aspect_ratio );
+  projectionMatrix   = glm42::perspective( 0.1f, 100.0f, 45.0f, aspect_ratio );
+
   FpsCounter counter;
 
   bool show_fps    = (config_ptr->sections.contains("render_loop")) ? std::get<bool> (config_ptr->sections["render_loop"]["show_fps"]): false;
   bool draw_bounds = (config_ptr->sections.contains("render_loop")) ? std::get<bool> (config_ptr->sections["render_loop"]["draw_bounds"]): false;
 
   std::vector<Debug3DLine> lines;
-  lines.reserve(100);
+  lines.reserve(10000);
 
   EventChannel::getInstance().publish("NewMouseEvent",
   std::make_pair<EMouseEvent, std::any>(
@@ -136,23 +138,39 @@ void Window::drawLoop() {
   helper_lines(lines);
 
   EventChannel::getInstance().publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_P, [&](Window *) {
-    auto mtx = projectionMatrix * camera->viewMatrix;
-    auto w = 0.0f;
+    auto w = 1.0f;
 
-    auto tl = mtx * glm42::vec4(-1.f, 1.f, -1.f, w);
-    auto tr = mtx * glm42::vec4(1.f, 1.f, -1.f, w);
-    auto bl = mtx * glm42::vec4(-1.f, -1.f, -1.f, w);
-    auto br = mtx * glm42::vec4(1.f, -1.f, -1.f, w);
+    auto emplacelines = [&](const glm42::mat4 & mtx, const glm42::vec3 & color, const glm42::vec3 & color2){
+      auto tl = mtx * glm42::vec4(-1.f, 1.f, -1.f, w);
+      auto tr = mtx * glm42::vec4(1.f, 1.f, -1.f, w);
+      auto bl = mtx * glm42::vec4(-1.f, -1.f, -1.f, w);
+      auto br = mtx * glm42::vec4(1.f, -1.f, -1.f, w);
 
-    auto tlf = mtx * glm42::vec4(-1.f, 1.f, 1.f, w);
-    auto trf = mtx * glm42::vec4(1.f, 1.f, 1.f, w);
-    auto blf = mtx * glm42::vec4(-1.f, -1.f, 1.f, w);
-    auto brf =  mtx * glm42::vec4(1.f, -1.f, 1.f, w);
+      auto tlf = mtx * glm42::vec4(-1.f, 1.f, 1.f, w * 2);
+      auto trf = mtx * glm42::vec4(1.f, 1.f, 1.f, w * 2);
+      auto blf = mtx * glm42::vec4(-1.f, -1.f, 1.f, w * 2);
+      auto brf =  mtx * glm42::vec4(1.f, -1.f, 1.f, w * 2);
 
-    lines.emplace_back( tl.reduce(), tlf.reduce() );
-    lines.emplace_back( tr.reduce(), trf.reduce() );
-    lines.emplace_back( bl.reduce(), blf.reduce() );
-    lines.emplace_back( br.reduce(), brf.reduce() );
+      lines.emplace_back( tl.reduce(), tlf.reduce(), color2);
+      lines.emplace_back( tr.reduce(), trf.reduce(), color2);
+      lines.emplace_back( bl.reduce(), blf.reduce(), color2);
+      lines.emplace_back( br.reduce(), brf.reduce(), color2);
+
+      lines.emplace_back( tl.reduce(), tr.reduce(), color);
+      lines.emplace_back( tr.reduce(), br.reduce(), color);
+      lines.emplace_back( br.reduce(), bl.reduce(), color);
+      lines.emplace_back( bl.reduce(), tl.reduce(), color);
+
+      lines.emplace_back( tlf.reduce(), trf.reduce(), color);
+      lines.emplace_back( trf.reduce(), brf.reduce(), color);
+      lines.emplace_back( brf.reduce(), blf.reduce(), color);
+      lines.emplace_back( blf.reduce(), tlf.reduce(), color);
+    };
+
+    emplacelines(reverse( projectionMatrix ), {1.f, 1.f, 1.f}, {0.0, 0.0, 1.0});
+    // emplacelines(reverse( camera->viewMatrix ), {1.f, 1.f, 0.f}, {0.f, 1.f, 0.f});
+
+
   }));
 
 
