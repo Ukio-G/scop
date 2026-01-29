@@ -239,11 +239,11 @@ namespace glm42 {
         {
           if constexpr( dim == 2 )
           {
-
+            return data[ (col == 0) ? 1 : 0 ][ (row == 0) ? 1 : 0 ];
           }
           else
           {
-
+            return minor_matrix( col, row ).det();
           }
         }
 
@@ -373,6 +373,13 @@ namespace glm42 {
         for (size_t j = 0; j < 4; ++j)
           result.data[i][j] = m.data[i][j] * ((j < 3) ? v.data[j] : 1);
       return result;
+    }
+
+    template< typename T, size_t dim >
+    inline mat< T, dim > scale( const mat< T, dim > &m, vec< T, dim - 1 > v )
+    {
+      static_assert( dim == 4, "scale is defined for 4x4 matrices only" );
+      return scale( m, vec< T, dim >( v ) );
     }
 
     // Builds a rotation 4 * 4 matrix created from an axis vector and an angle

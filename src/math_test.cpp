@@ -23,10 +23,31 @@ bool operator==(const glm42::mat4& lhs, const glm::mat4& rhs) {
   return true;
 }
 
+bool operator==(const glm42::mat3& lhs, const glm::mat3& rhs) {
+  for (int col = 0; col < 3; ++col) {
+    for (int row = 0; row < 3; ++row) {
+      if (std::abs(lhs.data[col][row] - rhs[col][row]) > eps) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 void print_matrix(const glm::mat4& m) {
   std::cout << "GLM Matrix:\n";
   for (int row = 0; row < 4; ++row) {
     for (int col = 0; col < 4; ++col) {
+      std::cout << std::setw(10) << std::setprecision(4) << m[col][row] << ' ';
+    }
+    std::cout << '\n';
+  }
+}
+
+void print_matrix(const glm::mat3& m) {
+  std::cout << "GLM Matrix:\n";
+  for (int row = 0; row < 3; ++row) {
+    for (int col = 0; col < 3; ++col) {
       std::cout << std::setw(10) << std::setprecision(4) << m[col][row] << ' ';
     }
     std::cout << '\n';
@@ -55,14 +76,6 @@ void fill_random(glm42::mat4& mat, std::mt19937& rng, std::uniform_real_distribu
   for (int col = 0; col < 4; ++col)
     for (int row = 0; row < 4; ++row)
       mat.at(col,row) = dist(rng);
-}
-
-glm42::mat4 to_my_mat(const glm::mat4& gmat) {
-  glm42::mat4 result;
-  for (int col = 0; col < 4; ++col)
-    for (int row = 0; row < 4; ++row)
-      result.data[col][row] = gmat[col][row];
-  return result;
 }
 
 glm::mat4 random_matrix(int seed) {
@@ -178,7 +191,7 @@ void translate_test(float x, float y, float z)
   }
 }
 
-void inverse_matrix_test(int seed = 42)
+void inverse_matrix_test(int seed = 42, bool debug_print = false)
 {
   std::mt19937 rng(seed);
   std::uniform_real_distribution<float> dist(-10.0f, 10.0f);
@@ -202,23 +215,65 @@ void inverse_matrix_test(int seed = 42)
       throw std::runtime_error("Inverse matrix test failed");
       }
     }
+    if (debug_print)
+    {
+      print_matrix(a_inverse);
+      print_matrix(my_a_inverse);
+    }
 }
 
 inline float to_radians(float angle) {
   return M_PI * angle / 180.f;
 }
 
-void minor_test()
+glm::mat3 glm_minor_matrix(const glm::mat4& mtx, int col, int row)
 {
-  glm42::mat4 mtx = random_matrix_42();
+  glm::mat3 result(1.0f);
+  int c2 = 0;
+  for (int c = 0; c < 4; ++c) {
+    if (c == col)
+      continue;
+    int r2 = 0;
+    for (int r = 0; r < 4; ++r) {
+      if (r == row)
+        continue;
+      result[c2][r2] = mtx[c][r];
+      ++r2;
+    }
+    ++c2;
+  }
+  return result;
+}
 
-  print_matrix(mtx);
+void minor_test(int seed = 42)
+{
+  glm::mat4 glm_mtx = random_matrix(seed);
+  glm42::mat4 my_mtx = to_my_mat(glm_mtx);
 
-  for(size_t i = 0; i < 4; i++){
-    for(size_t j = 0; j < 4; j++){
-      std::cout << "Minor " << i << " " << j << std::endl;
-      glm42::mat3 minor = mtx.minor(i, j);
-      print_matrix(minor);
+  if (glm_mtx != my_mtx)
+    throw std::runtime_error("Matrix compare before minor test failed");
+
+  for(int col = 0; col < 4; col++){
+    for(int row = 0; row < 4; row++){
+      glm::mat3 glm_minor_m = glm_minor_matrix(glm_mtx, col, row);
+      glm42::mat3 my_minor_m = my_mtx.minor_matrix(col, row);
+
+      if (glm_minor_m != my_minor_m)
+      {
+        std::cout << "Minor matrix mismatch at (" << col << "," << row << ")\n";
+        print_matrix(glm_minor_m);
+        print_matrix(my_minor_m);
+        throw std::runtime_error("Minor matrix test failed");
+      }
+
+      float glm_minor_v = glm::determinant(glm_minor_m);
+      float my_minor_v = my_mtx.minor(col, row);
+      if (std::abs(glm_minor_v - my_minor_v) > eps)
+      {
+        std::cout << "Minor value mismatch at (" << col << "," << row << ")\n";
+        std::cout << glm_minor_v << " vs " << my_minor_v << std::endl;
+        throw std::runtime_error("Minor value test failed");
+      }
     }
   }
 }
@@ -285,7 +340,10 @@ int main()
   translate_test(21, 11, 31);
   std::cout << "Translation test 6 passed" << std::endl;
 
-  minor_test();
+  for (int i = 0 ; i < 10; i++) {
+    minor_test(i);
+    std::cout << "Minor test " << i << " passed" << std::endl;
+  }
 
   for (int i = 0 ; i < 10; i++) {
     determinant_test(i);
@@ -296,5 +354,7 @@ int main()
     inverse_matrix_test(i);
     std::cout << "Inverse test " << i << " passed" << std::endl;
   }
+  
+  inverse_matrix_test(42, true);
   return 0;
 }
