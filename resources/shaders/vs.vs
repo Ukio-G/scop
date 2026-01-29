@@ -5,6 +5,26 @@ layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 aTexCoords;
 layout (location = 3) in vec3 aColor;
 
+uniform ObjectData{
+    mat4 modelMatrix;
+} objData;
+
+layout(std140) uniform SubspaceData {
+    mat4 subspaceMatrix;
+} subspaceData;
+
+layout(std140) uniform FrameData {
+     mat4   projection;
+     mat4   view;
+     mat4   transform;
+     vec4   viewPos;
+
+     int    hasTexture;
+     float  textureColorLerpFactor;
+     int   flatShading;
+     int   grayscale;
+} frameData;
+
 out VS_OUT {
     vec3 FragPos;
     vec3 Normal;
@@ -14,17 +34,10 @@ out VS_OUT {
 
 flat out vec3 flat_color;
 
-uniform mat4 projection;
-uniform mat4 view;
-uniform mat4 transform;
-uniform vec3 viewPos;
-
-uniform float u_time;
-
 void main()
 {
-    vs_out.FragPos = vec4(transform * vec4(aPos, 1)).xyz;
+    vs_out.FragPos = vec4(subspaceData.subspaceMatrix * objData.modelMatrix * vec4(aPos, 1)).xyz;
     vs_out.Color = aColor;
     flat_color = aColor;
-    gl_Position = projection * view * transform * vec4(aPos.xyz, 1.0);
+    gl_Position = frameData.projection * frameData.view * subspaceData.subspaceMatrix * objData.modelMatrix * vec4(aPos.xyz, 1.0);
 }

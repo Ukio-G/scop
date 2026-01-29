@@ -2,10 +2,12 @@
 #define OBJECT3D_HPP
 
 #include <GL/glew.h>
+#include <vector>
 #include "math.hpp"
 #include "BuffersCollection.hpp"
 #include "Graphic/TexturesPack.hpp"
 #include "Graphic/Shader.hpp"
+
 class Object3D {
 public:
 	Object3D() = default;
@@ -15,8 +17,8 @@ public:
   virtual ~Object3D() = default;
 
   // Draw API
-  void draw( const ShaderProgram &shaderProgram );
-  void bindToDraw( const ShaderProgram &shaderProgram );
+  void draw();
+  void bindToDraw() const;
 
   // Movement API
   void        setTranslate( const glm42::vec4 &translate );
@@ -31,12 +33,12 @@ public:
   glm42::vec4 getRotate() const;
 
   void updateModelMatrix();
+  void initUBO(ShaderProgram& program);
 
   const glm42::mat4 &getRotationMatrix() const;
   const glm42::mat4 &getTranslateMatrix() const;
   const glm42::mat4 &getScaleMatrix() const;
   const glm42::mat4 &getModelMatrix() const;
-  void               setUseTexture( bool use_texture );
 
 
   geom::BoundBox getBoundBox() const;
@@ -44,6 +46,7 @@ private:
   std::string   name;
   Geometry      geometry;
   TexturesPack* textures = nullptr;
+	unsigned int UBO = 0;
 
   glm42::vec4 rotateVector    = glm42::vec4( 0.0 );
   glm42::vec4 translateVector = glm42::vec4( 0.0 );
@@ -54,7 +57,6 @@ private:
   glm42::mat4 scaleMatrix     = glm42::mat4::id();
 	glm42::mat4 modelMatrix     = glm42::mat4::id();
 
-  bool useTexture = false;
   float textureColorLerpFactor = 0.f;
 
   bool dirtyTransform = false;

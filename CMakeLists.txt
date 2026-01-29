@@ -18,9 +18,9 @@ add_compile_definitions(GL_SILENCE_DEPRECATION)
 set(CMAKE_C_COMPILER /opt/homebrew/opt/llvm@20/bin/clang)
 set(CMAKE_CXX_COMPILER /opt/homebrew/opt/llvm@20/bin/clang++)
 
-# find_package(OpenGL REQUIRED)
-# find_package(GLEW   REQUIRED)
-# find_package(glfw3  REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(GLEW   REQUIRED)
+find_package(glfw3  REQUIRED)
 
 set(APP_TARGET scop)
 
@@ -39,9 +39,9 @@ add_executable(math_tests src/math_test.cpp)
 
 target_link_libraries(${APP_TARGET}
     PRIVATE
-    # GLEW::GLEW        # загружаем расширения OpenGL
-    # glfw              # кроссплатформенное окно/ввод
-    # OpenGL::GL        # системный фреймворк OpenGL
+    GLEW::GLEW        # загружаем расширения OpenGL
+    glfw              # кроссплатформенное окно/ввод
+    OpenGL::GL        # системный фреймворк OpenGL
 )
 
 
@@ -49,14 +49,14 @@ target_include_directories(${APP_TARGET} PRIVATE deps/include)
 target_link_directories(${APP_TARGET} PRIVATE deps/lib)
 
 
-# target_include_directories(${APP_TARGET} PRIVATE /opt/homebrew/opt/llvm@19/include)
-# target_link_directories(${APP_TARGET} PRIVATE /opt/homebrew/opt/llvm@19/lib)
+target_include_directories(${APP_TARGET} PRIVATE /opt/homebrew/opt/llvm@19/include)
+target_link_directories(${APP_TARGET} PRIVATE /opt/homebrew/opt/llvm@19/lib)
 
 target_link_libraries(math_tests
     PRIVATE
-    # GLEW::GLEW        # загружаем расширения OpenGL
-    # glfw              # кроссплатформенное окно/ввод
-    # OpenGL::GL        # системный фреймворк OpenGL
+    GLEW::GLEW        # загружаем расширения OpenGL
+    glfw              # кроссплатформенное окно/ввод
+    OpenGL::GL        # системный фреймворк OpenGL
 )
 
 target_include_directories(${APP_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/include)

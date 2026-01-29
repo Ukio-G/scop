@@ -21,8 +21,12 @@
 #include "include/TransformBehaviour/TransformBehaviour.hpp"
 #include "include/IO/ShadersControls.hpp"
 #include "include/Debug3DLine.hpp"
+#include "include/Subspace.hpp"
+
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+
 Window::Window() : width( 0 ) , height( 0 ) {
 }
 
@@ -58,21 +62,14 @@ void Window::initViewport() {
 
 Window::Window(int width, int height) : width(width), height(height), name("Window") { }
 
-void Window::passUniforms() {
-	shaderProgram->setMatrix4d("projection", projectionMatrix);
-	shaderProgram->setMatrix4d("view", camera->viewMatrix);
-	shaderProgram->setFloat3d("viewPos", camera->position);
-}
-
 void Window::addObject3DToDraw(Object3D * object3d) {
 	objects3d.push_back(object3d);
 }
 
 void Window::draw3DObjects() {
   shaderProgram->use();
-  passUniforms();
 	for (auto & object3D: objects3d ) {
-		object3D->draw(*shaderProgram);
+		object3D->draw();
 	}
 }
 
@@ -99,13 +96,31 @@ void Window::drawLoop() {
   ObjectsControls          objControls( this, objects3d, behaviours );
   ShadersControls          shadersControls ( shaderProgram );
 
-  wbox.init();
+  objControls.initControls();
+
+  shadersControls.initControls();
+  shadersControls.initUBO();
+  shadersControls.initLineShaders();
+
+  wbox.init(shadersControls.UBO);
+
+  auto id = glm42::mat4::id();
+
+  glm42::mat4 ss_scaled = glm42::scale(id, glm42::vec3{0.1, 0.1, 0.1});
+  glm42::mat4 ss_1 = glm42::translate(ss_scaled, glm42::vec3{15, 0, 0});
+  glm42::mat4 ss_2 = glm42::translate(ss_scaled, glm42::vec3{-15, 0, 0});
+
+  Subspace gloal(id, glm42::vec3(0.5f, 0.5f, 0.5f));
+  Subspace subspace(ss_1, glm42::vec3(0.f, 0.5f, 0.5f));
+  Subspace subspace2(ss_2, glm42::vec3(0.2f, 0.7f, 0.9f));
+
+  gloal.initUBO(shadersControls);
+  subspace.initUBO(shadersControls);
+  subspace2.initUBO(shadersControls);
+
   glfwSetInputMode( glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
   glfwMakeContextCurrent( glfwWindow );
   glfwSwapInterval( 1 );
-
-  objControls.initControls();
-  shadersControls.initControls();
 
   glEnable( GL_DEPTH_TEST );
   glEnable( GL_CULL_FACE );
@@ -120,21 +135,6 @@ void Window::drawLoop() {
 
   std::vector<Debug3DLine> lines;
   lines.reserve(10000);
-
-  EventChannel::getInstance().publish("NewMouseEvent",
-  std::make_pair<EMouseEvent, std::any>(
-    EME_CLICK_LEFT,
-    std::function<void(double, double)> ([&](double x, double y)
-    {
-      glm42::vec3 begin = camera->position;
-      glm42::vec3 end = camera->position + camera->front * 10;
-
-      std::cout << x << " " << y << std::endl;
-
-      lines.emplace_back( begin, end );
-      std::cout << lines.size() << " lines" << std::endl;
-    })));
-
   helper_lines(lines);
 
   EventChannel::getInstance().publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_P, [&](Window *) {
@@ -149,7 +149,7 @@ void Window::drawLoop() {
       auto tlf = mtx * glm42::vec4(-1.f, 1.f, 1.f, w * 2);
       auto trf = mtx * glm42::vec4(1.f, 1.f, 1.f, w * 2);
       auto blf = mtx * glm42::vec4(-1.f, -1.f, 1.f, w * 2);
-      auto brf =  mtx * glm42::vec4(1.f, -1.f, 1.f, w * 2);
+      auto brf = mtx * glm42::vec4(1.f, -1.f, 1.f, w * 2);
 
       lines.emplace_back( tl.reduce(), tlf.reduce(), color2);
       lines.emplace_back( tr.reduce(), trf.reduce(), color2);
@@ -168,11 +168,14 @@ void Window::drawLoop() {
     };
 
     emplacelines(reverse( projectionMatrix ), {1.f, 1.f, 1.f}, {0.0, 0.0, 1.0});
-    // emplacelines(reverse( camera->viewMatrix ), {1.f, 1.f, 0.f}, {0.f, 1.f, 0.f});
-
-
   }));
 
+  for (auto& obj: objects3d)
+  {
+    obj->initUBO(*shaderProgram);
+    subspace.addObj(obj);
+    subspace2.addObj(obj);
+  }
 
   while( !glfwWindowShouldClose( glfwWindow ) ) {
     glClearColor( 0.1f, 0.1f, 0.1f, 1.0f );
@@ -182,19 +185,22 @@ void Window::drawLoop() {
     mouseControls->pollingMouseEvents();
     camera->updateViewMatrix();
 
+    shaderProgram->use();
     behaviours.update();
-    shadersControls.update();
 
-    draw3DObjects();
-
-    if (!objects3d.empty() && draw_bounds)
-      wbox.draw( camera->viewMatrix, projectionMatrix, **objControls.m_selectedObjectIt );
+    shadersControls.update(*camera, projectionMatrix);
+    
+    // if (!objects3d.empty() && draw_bounds)
+      // wbox.draw( **objControls.m_selectedObjectIt );
 
     if (show_fps)
       counter.frame();
 
-    for(auto& line: lines)
-      line.draw( camera->viewMatrix, projectionMatrix );
+    gloal.draw( shadersControls );
+    subspace.draw( shadersControls );
+    subspace2.draw( shadersControls );
+    draw3DObjects();
+
 
     glfwSwapBuffers( glfwWindow );
     glfwPollEvents();

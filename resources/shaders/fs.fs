@@ -1,18 +1,30 @@
 #version 330 core
 
+
+layout(std140) uniform ObjectData {
+    mat4 modelMatrix;
+} objData;
+
+layout(std140) uniform FrameData {
+     mat4   projection;
+     mat4   view;
+     mat4   transform;
+     vec4   viewPos;
+
+     int    hasTexture;
+     float  textureColorLerpFactor;
+     int   flatShading;
+     int   grayscale;
+} frameData;
+
 uniform sampler2D diffuseMap;
-uniform int u_hasTexture;
-uniform float u_textureColorLerpFactor;
-uniform bool u_flatShading;
-uniform bool u_grayscale;
 
 in VS_OUT {
   vec3 FragPos;
   vec3 Normal;
   vec2 TexCoords;
   vec3 Color;
-}
-fs_in;
+} fs_in;
 
 flat in vec3 flat_color;
 out vec4 FragColor;
@@ -41,11 +53,11 @@ void main() {
     vec3 fast_normal = fastNormal(fs_in.FragPos);
 
     vec3 triplanarTextureColor = vec3(0, 0, 0);
-    if (u_hasTexture > 0)
+    if (frameData.hasTexture > 0)
         triplanarTextureColor = sampleTriplanar(fs_in.FragPos * 4.0, fast_normal);
 
     vec3 vertexColor = vec3(0);
-    if (u_flatShading)
+    if (frameData.flatShading > 0)
         vertexColor = flat_color;
     else
         vertexColor = fs_in.Color;
@@ -53,16 +65,16 @@ void main() {
     
     vec3 resultColor = vec3(0);
 
-    if (u_hasTexture > 0)
+    if (frameData.hasTexture > 0)
     {
-        resultColor = mix(triplanarTextureColor, vertexColor, u_textureColorLerpFactor);
+        resultColor = mix(triplanarTextureColor, vertexColor, frameData.textureColorLerpFactor);
     }
     else
     {
         resultColor = vertexColor;
     }
 
-    if (u_grayscale) {
+    if (frameData.grayscale > 0) {
         float graylevel = (resultColor[0] + resultColor[1] + resultColor[2]) / 3;
         resultColor[0] = graylevel;
         resultColor[1] = graylevel;

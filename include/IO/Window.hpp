@@ -35,7 +35,6 @@ using NativeWindowType = GLFWwindow;
 	void initShaders();
 	void initIO();
 
-	void passUniforms();
 	void draw3DObjects();
 
 	void drawLoop();
