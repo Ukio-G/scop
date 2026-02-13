@@ -35,7 +35,8 @@ void ShadersControls::initUBO()
   GLuint blockIndex = glGetUniformBlockIndex(m_program->shaderProgram, "FrameData");
   if (blockIndex == GL_INVALID_INDEX)
     std::cerr << "ERROR: FrameData block not found in main program\n";
-  glUniformBlockBinding(m_program->shaderProgram, blockIndex, (GLuint)ShaderProgram::BindingPoint::FrameData);
+  else
+    glUniformBlockBinding(m_program->shaderProgram, blockIndex, (GLuint)ShaderProgram::BindingPoint::FrameData);
 
   glBindBuffer(GL_UNIFORM_BUFFER, UBO);
   glBufferData(GL_UNIFORM_BUFFER, sizeof(ShadersControls::FrameData), &(this->frameData), GL_DYNAMIC_DRAW);

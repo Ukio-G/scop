@@ -5,7 +5,7 @@ layout (location = 1) in vec2 aTexCoords;
 layout (location = 2) in vec3 aNormal;
 layout (location = 3) in vec3 aColor;
 
-uniform ObjectData{
+layout(std140) uniform ObjectData{
     mat4 modelMatrix;
 } objData;
 

@@ -127,7 +127,8 @@ void Object3D::initUBO(ShaderProgram& program)
   GLuint blockIndex = glGetUniformBlockIndex(program.shaderProgram, "ObjectData");
   if (blockIndex == GL_INVALID_INDEX)
     std::cerr << "ERROR: ObjectData block not found in object program\n";
-  glUniformBlockBinding(program.shaderProgram, blockIndex, (GLuint)ShaderProgram::BindingPoint::ObjectData);
+  else
+    glUniformBlockBinding(program.shaderProgram, blockIndex, (GLuint)ShaderProgram::BindingPoint::ObjectData);
 
   glBindBuffer(GL_UNIFORM_BUFFER, UBO);
   glBufferData(GL_UNIFORM_BUFFER, sizeof(glm42::mat4), &(this->modelMatrix), GL_DYNAMIC_DRAW);
