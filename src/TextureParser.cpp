@@ -25,7 +25,6 @@ void TextureParser::loadBMPFromFile(const std::string &fileName) {
     int width, height;
     size_t pixel_data_idx = 0;
 
-
     // Open file
     std::ifstream file(fileName, std::ios::binary);
     if (!file.is_open()) {
@@ -62,13 +61,13 @@ void TextureParser::loadBMPFromFile(const std::string &fileName) {
     auto&t = textureKeeper->textures[name].textures[ETT_DIFFUSE];
     t = Texture();
 
-    t->data = reinterpret_cast<unsigned char*>(bytes.data() + pixel_data_idx);
+    auto data = reinterpret_cast<unsigned char*>(bytes.data() + pixel_data_idx);
     t->height = height;
     t->width = width;
     t->numChannels = 4;
     t->textureSize = width * height * bpp;
     t->path = fileName;
-    t->init();
+    t->init(data);
 
     // Save texture to texture manager
 }

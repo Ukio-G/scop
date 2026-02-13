@@ -2,6 +2,7 @@
 #define TEXTURE_HPP
 
 #include "TextureParameters.hpp"
+#include <memory>
 #include <string>
 
 class Texture {
@@ -15,17 +16,16 @@ public:
   Texture& operator=(const Texture &Texture);
   Texture& operator=(Texture &&Texture ) noexcept;
 
-  void init();
+  void init(unsigned char* data);
   void bind(int type = 0);
-  void getGLTexture();
+  void getGLTexture(unsigned char* data);
 
-  unsigned int id = 0;
+  std::shared_ptr<unsigned int> id = nullptr;
   std::string path;
   TextureParameters parameters;
   int width = 0;
   int height = 0;
   int numChannels = 0;
-  unsigned char *data = nullptr;
   size_t textureSize = 0;
 };
 

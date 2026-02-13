@@ -16,6 +16,11 @@ class Subspace
           int grid_from = -10, int grid_to = 10, int grid_step = 1)
     : m_grid(grid_color, grid_from ,grid_to, grid_step), m_subspace_matrix(subspace_matrix) { }
 
+  ~Subspace()
+  {
+    glDeleteBuffers(1, &m_UBO);
+  }
+
   struct Grid
   {
     Grid(const glm42::vec3& color, int from = -10, int to = 10, int step = 1)

@@ -41,6 +41,9 @@ class ShadersControls {
   public:
   ShadersControls() = delete;
   ShadersControls(ShaderProgram* program) : m_program(program) { }
+  ~ShadersControls() {
+    glDeleteBuffers(1, &UBO);
+  }
 
   void initControls();
   void update(Camera& camera, glm42::mat4& projectionMatrix);

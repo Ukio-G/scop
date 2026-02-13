@@ -14,7 +14,9 @@ public:
 	Object3D( const Object3D &other );
   Object3D(const std::string& name, Geometry geometry, TexturesPack* textures );
   Object3D &operator=( const Object3D &other );
-  virtual ~Object3D() = default;
+  virtual ~Object3D() {
+    glDeleteBuffers(1, &UBO);
+  }
 
   // Draw API
   void draw();

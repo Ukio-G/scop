@@ -32,6 +32,11 @@ public:
         glUseProgram(shaderProgram);
     }
 
+    ~ShaderProgram()
+    {
+        glDeleteProgram(shaderProgram);
+    }
+
     enum class BindingPoint : GLuint { ObjectData, FrameData, SubspaceData };
 
     void setBool(const std::string &name, bool value) const;  

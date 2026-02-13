@@ -35,6 +35,16 @@ using Ptr = std::shared_ptr<GeometryKeeper>;
 		throw std::runtime_error("No available geometry: " + name);
 	}
 
+	~GeometryKeeper()
+	{
+		for(auto &[_, geom]: geometry)
+		{
+			glDeleteVertexArrays(1, &geom.buffers.VAO);
+			glDeleteBuffers(1, &geom.buffers.VBO);
+			glDeleteBuffers(1, &geom.buffers.EBO);
+		}
+	}
+
 private:
   std::unordered_map<std::string, std::vector<geom::Vertex> > vertexData;
   std::unordered_map<std::string, std::vector<unsigned int> > indexesData;

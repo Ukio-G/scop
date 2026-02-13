@@ -44,12 +44,12 @@ using NativeWindowType = GLFWwindow;
 private:
 	template<class T>
 	using GeometryContainer = std::vector<T>;
-	GeometryContainer<Object3D*> objects3d;
 
 	ShaderProgram* shaderProgram = nullptr;
 	KeysControls* keysControls = nullptr;
 	MouseControls* mouseControls = nullptr;
 	Camera* camera = nullptr;
+	GeometryContainer<Object3D*> objects3d;
 
 	int width;
 	int height;

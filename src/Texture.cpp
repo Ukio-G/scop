@@ -1,6 +1,7 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++, C#, and Java: https://pvs-studio.com
 #include <cstring>
+#include <memory>
 
 #ifdef TARGET_OS_OSX
 #include <OpenGL/gl.h>
@@ -13,11 +14,10 @@
 #include <stdexcept>
 #include <iostream>
 
-Texture::Texture(const std::string &path) : path(path) { init(); }
+Texture::Texture(const std::string &path) : path(path) {  }
 
 Texture::Texture(const std::string &path, const TextureParameters &parameters)
     : path(path), parameters(parameters) {
-  init();
 }
 
 Texture::Texture(Texture &&other ) noexcept {
@@ -28,26 +28,23 @@ Texture::Texture(const Texture &other) {
   *this = other;
 }
 
-Texture::~Texture() = default;
+Texture::~Texture()
+{
+
+}
 
 Texture &Texture::operator=(const Texture &other) {
   if (this == &other)
     return *this;
-  path.clear();
 
+  path = other.path;
   parameters = other.parameters;
   width = other.width;
   height = other.height;
   numChannels = other.numChannels;
   textureSize = other.textureSize;
+  id = other.id;
 
-  if (!other.data)
-  	return *this;
-  
-  data = new unsigned char[textureSize];
-  memcpy(data, other.data, textureSize);
-  getGLTexture();
-  
   return *this;
 }
 
@@ -62,10 +59,8 @@ Texture &Texture::operator=(Texture &&other ) noexcept
   height = other.height;
   numChannels = other.numChannels;
   id = other.id;
-  data = other.data;
   textureSize = other.textureSize;
 
-  other.data = nullptr;
   other.path.clear();
   other.width = 0;
   other.height = 0;
@@ -76,28 +71,30 @@ Texture &Texture::operator=(Texture &&other ) noexcept
   return *this;
 }
 
-void Texture::init() {
-  if (!data)
-    throw std::runtime_error("Failed to load texture: " + path);
-  
+void Texture::init(unsigned char* data) {
   textureSize = width * height * numChannels;
   std::cout << "Loaded texture from: \"" << path << "\", size: " << textureSize;
   std::cout << ", channels: " << numChannels << std::endl;
 
-  getGLTexture();
+  getGLTexture(data);
 }
 
-void Texture::getGLTexture()
+void Texture::getGLTexture(unsigned char* data)
 {
-  glGenTextures( 1, &id );
-  glBindTexture( GL_TEXTURE_2D, id );
+  id = std::shared_ptr<unsigned int>(new unsigned int, 
+    [](unsigned int* _id) {
+      glDeleteTextures(1, _id);  
+      delete _id;
+    });
 
-  std::cout << "Texture ID: " << id << std::endl;
+  glGenTextures( 1, id.get() );
+  glBindTexture( GL_TEXTURE_2D, *id );
+
+  std::cout << "Texture ID: " << *id << std::endl;
   parameters.apply();
 
   const GLint  internal = ( numChannels == 4 ) ? GL_RGBA8 : GL_RGB8;
   const GLenum external = ( numChannels == 4 ) ? GL_BGRA : GL_BGR;
-
 
   glTexImage2D( GL_TEXTURE_2D, 0, internal, width, height, 0, external, GL_UNSIGNED_BYTE, data );
 
@@ -109,5 +106,5 @@ void Texture::getGLTexture()
 
 void Texture::bind(int type) {
   glActiveTexture(GL_TEXTURE0 + type);
-  glBindTexture(GL_TEXTURE_2D, id);
+  glBindTexture(GL_TEXTURE_2D, *id);
 }

@@ -14,6 +14,12 @@ public:
   {
     init();
   }
+  ~Debug3DLine()
+  {
+    glDeleteBuffers(1, &m_VBO);
+    glDeleteVertexArrays(1, &m_VAO);
+    glDeleteBuffers(1, &m_EBO);
+  }
 
   void init()
   {

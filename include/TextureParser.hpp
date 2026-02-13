@@ -14,9 +14,6 @@ class TextureParser {
     void loadBMPFromFile(const std::string& fileName);
 
 private:
-
-
-
     TexturesKeeper* textureKeeper;
 };
 

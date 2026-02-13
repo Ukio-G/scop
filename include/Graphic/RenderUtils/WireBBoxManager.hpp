@@ -11,6 +11,13 @@ class WireBBoxManager {
 
 public:
   WireBBoxManager() = default;
+  ~WireBBoxManager()
+  {
+    glDeleteBuffers(1, &m_VBO);
+    glDeleteVertexArrays(1, &m_VAO);
+    glDeleteBuffers(1, &m_EBO);
+    glDeleteBuffers(1, &m_objectUBO);
+  }
 
   void init(GLuint frameUBO) {
     glGenVertexArrays(1, &m_VAO);
@@ -67,7 +74,6 @@ public:
     // User-defined binding point number and just generated buffer with glGenBuffers(...)
     glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)ShaderProgram::BindingPoint::ObjectData, m_objectUBO);
     glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)ShaderProgram::BindingPoint::FrameData, m_frameUBO);
-    glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)ShaderProgram::BindingPoint::SubspaceData, m_subspaceUBO);
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
   }
@@ -120,6 +126,5 @@ private:
   GLuint                           m_VAO = 0, m_VBO = 0, m_EBO = 0;
   GLuint                           m_objectUBO = 0;
   GLuint                           m_frameUBO = 0;
-  GLuint                           m_subspaceUBO = 0;
   std::unique_ptr< ShaderProgram > m_shaderProgram;
 };

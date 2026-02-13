@@ -142,7 +142,6 @@ void Window::drawLoop() {
 
   std::cout << "Draw loop destroyed" << std::endl;
   EventChannel::getInstance().publish( "destroyApplication", true );
-  glfwTerminate();
 }
 
 void Window::initShaders() {
@@ -159,8 +158,6 @@ void Window::initShaders() {
 }
 
 Window::~Window() {
-	glfwDestroyWindow(glfwWindow);
-
 	delete shaderProgram;
 	delete keysControls;
 	delete mouseControls;
@@ -168,6 +165,9 @@ Window::~Window() {
   for (auto obj_ptr : objects3d) {
     delete obj_ptr;
   }
+  std::cout << "Window resources released" << std::endl;
+	glfwDestroyWindow(glfwWindow);
+  glfwTerminate();
 }
 
 void Window::initIO() {

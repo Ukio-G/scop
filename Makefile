@@ -61,6 +61,7 @@ include/Vertex.hpp \
 include/cfg_parser.hpp \
 include/math.hpp \
 include/Debug3DLine.hpp \
+include/Subspace.hpp \
 modules/Resources/DescriptionObject3D.hpp \
 modules/Resources/GeometryKeeper.hpp \
 modules/Resources/ResourcesModule.hpp \
