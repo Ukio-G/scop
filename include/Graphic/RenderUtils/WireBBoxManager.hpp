@@ -86,6 +86,7 @@ public:
       m_shaderProgram->use();
       m_shaderProgram->setMatrix4d("uBboxScale", bboxLocal);
 
+      glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)ShaderProgram::BindingPoint::ObjectData, m_objectUBO);
       glBindBuffer(GL_UNIFORM_BUFFER, m_objectUBO);
       glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm42::mat4), &obj.getModelMatrix());
       glBindVertexArray(m_VAO);

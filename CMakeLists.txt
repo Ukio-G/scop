@@ -4,10 +4,12 @@ project(scop)
 set(CMAKE_CXX_STANDARD 20)
 
 set(CMAKE_OSX_DEPLOYMENT_TARGET "12.0" CACHE STRING "")
+link_directories(${CMAKE_SOURCE_DIR}/deps/lib)
+link_directories(${CMAKE_SOURCE_DIR}/deps)
 
-find_package(OpenGL REQUIRED)
-find_package(GLEW   REQUIRED)
-find_package(glfw3  REQUIRED)
+# find_package(OpenGL REQUIRED)
+# find_package(GLEW   REQUIRED)
+# find_package(glfw3  REQUIRED)
 
 set(APP_TARGET scop)
 
@@ -26,9 +28,9 @@ add_executable(math_tests src/math_test.cpp)
 
 target_link_libraries(${APP_TARGET}
     PRIVATE
-    GLEW::GLEW
-    glfw
-    OpenGL::GL
+    # GLEW::GLEW
+    # glfw
+    # OpenGL::GL
 )
 
 target_include_directories(${APP_TARGET} PRIVATE ${CMAKE_SOURCE_DIR}/include)
