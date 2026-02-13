@@ -48,14 +48,19 @@ private:
   TexturesPack* textures = nullptr;
 	unsigned int UBO = 0;
 
+  struct alignas(16) ObjectDataUBO {
+    glm42::mat4 modelMatrix = glm42::mat4::id();
+    int hasTexture;
+    int _pad[3];
+  } mutable objectData{};
+
   glm42::vec4 rotateVector    = glm42::vec4( 0.0 );
   glm42::vec4 translateVector = glm42::vec4( 0.0 );
   glm42::vec4 scaleVector     = glm42::vec4( 1.0 );
 
-  glm42::mat4 rotationMatrix  = glm42::mat4::id();
+	glm42::mat4 rotationMatrix  = glm42::mat4::id();
   glm42::mat4 translateMatrix = glm42::mat4::id();
   glm42::mat4 scaleMatrix     = glm42::mat4::id();
-	glm42::mat4 modelMatrix     = glm42::mat4::id();
 
   bool dirtyTransform = false;
 };

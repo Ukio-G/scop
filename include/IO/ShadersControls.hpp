@@ -64,13 +64,13 @@ class ShadersControls {
 
      float padding;
 
-     int    hasTexture;
      float  textureColorLerpFactor;
      int    flatShading;
      int    grayscale;
-  } frameData;
+  } frameData{};
 
   TweenFloat factor { .value = frameData.textureColorLerpFactor };
+  bool m_texturesEnabled = true;
 
   ShaderProgram* m_program;
   std::unique_ptr< ShaderProgram > m_lineProgram;

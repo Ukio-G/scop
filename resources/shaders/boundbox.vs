@@ -5,6 +5,8 @@ layout(location = 1) in vec3 aColor;
 
 layout(std140) uniform ObjectData{
     mat4 modelMatrix;
+    int  hasTexture;
+    int  padding[3];
 } objData;
 
 layout(std140) uniform SubspaceData {
@@ -17,7 +19,6 @@ layout(std140) uniform FrameData {
      mat4   transform;
      vec4   viewPos;
 
-     int    hasTexture;
      float  textureColorLerpFactor;
      int   flatShading;
      int   grayscale;

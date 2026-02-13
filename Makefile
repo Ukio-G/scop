@@ -1,5 +1,5 @@
 .PHONY: all clean
-CXXFLAGS = -std=c++20 -O3 # -Wextra -Wall -Werror
+CXXFLAGS = -std=c++20 -O3 -Wextra -Wall -Werror
 INCLUDE = -I. -Imodules/GLWindow -Imodules/Resources -Iinclude -Iinclude/Graphic -Iinclude/IO -Iinclude/ModuleDispatcher -I./deps/include
 CXX=g++
 

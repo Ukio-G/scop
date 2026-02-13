@@ -17,7 +17,8 @@ void ShadersControls::initControls() {
 
     // Texture-color
     eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_T, [this](Window *) {
-      factor.start(factor.value < 0.5f ? 1.0f : 0.0f, 0.7f);
+      m_texturesEnabled = !m_texturesEnabled;
+      factor.start(m_texturesEnabled ? 0.0f : 1.0f, 0.7f);
     }));
 
     // GrayScale on-off

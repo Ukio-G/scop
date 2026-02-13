@@ -15,7 +15,8 @@ Object3D::Object3D( const Object3D& other ) {
 Object3D::Object3D( const std::string& name, Geometry geometry, TexturesPack* textures )
     : name( name )
     , geometry( geometry )
-    , textures( textures ) { }
+    , textures( textures )
+{ }
 
 Object3D& Object3D::operator=( const Object3D& other )
 {
@@ -25,6 +26,7 @@ Object3D& Object3D::operator=( const Object3D& other )
   name                   = other.name;
   geometry               = other.geometry;
   textures               = other.textures;
+  objectData             = other.objectData;
 
   setTranslate( other.translateVector );
   setScale( other.scaleVector );
@@ -45,10 +47,16 @@ void Object3D::draw() {
 }
 
 void Object3D::bindToDraw() const {
-  if( textures ) {
-    if (auto diffuse = textures->diffuse()) {
+  if (textures && textures->diffuse())
+  {
+    objectData.hasTexture = 1;
+    if (auto diffuse = textures->diffuse())
       diffuse->bind();
-    }
+  } else
+  {
+    objectData.hasTexture = 0;
+    glActiveTexture(GL_TEXTURE0); // Diffuse (only used in project)
+    glBindTexture(GL_TEXTURE_2D, 0);
   }
 
   glBindVertexArray( geometry.buffers.VAO );
@@ -56,7 +64,7 @@ void Object3D::bindToDraw() const {
   glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)ShaderProgram::BindingPoint::ObjectData, UBO);
   
   glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-  glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm42::mat4), &(this->modelMatrix));
+  glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(ObjectDataUBO), &objectData);
   glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
@@ -80,7 +88,7 @@ glm42::vec4 Object3D::getRotate() const {
 }
 
 
-void        Object3D::setScale( const glm42::vec4& scale ) {
+void Object3D::setScale( const glm42::vec4& scale ) {
   scaleVector = scale;
   scaleMatrix = glm42::mat4::id();
   scaleMatrix = glm42::scale( scaleMatrix, glm42::vec4( scaleVector ) );
@@ -114,7 +122,7 @@ void Object3D::setRotate( const glm42::vec4& rotate ) {
 
 
 void Object3D::updateModelMatrix() {
-  modelMatrix = translateMatrix * rotationMatrix * scaleMatrix;
+  objectData.modelMatrix = translateMatrix * rotationMatrix * scaleMatrix;
 
   dirtyTransform = false;
 }
@@ -131,14 +139,13 @@ void Object3D::initUBO(ShaderProgram& program)
     glUniformBlockBinding(program.shaderProgram, blockIndex, (GLuint)ShaderProgram::BindingPoint::ObjectData);
 
   glBindBuffer(GL_UNIFORM_BUFFER, UBO);
-  glBufferData(GL_UNIFORM_BUFFER, sizeof(glm42::mat4), &(this->modelMatrix), GL_DYNAMIC_DRAW);
+  glBufferData(GL_UNIFORM_BUFFER, sizeof(ObjectDataUBO), &objectData, GL_DYNAMIC_DRAW);
 
   // User-defined binding point number and just generated buffer with glGenBuffers(...)
   glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)ShaderProgram::BindingPoint::ObjectData, UBO);
   
   glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
-
 
 const glm42::mat4& Object3D::getRotationMatrix() const {
   return rotationMatrix;
@@ -155,7 +162,7 @@ const glm42::mat4& Object3D::getScaleMatrix() const {
 }
 
 const glm42::mat4& Object3D::getModelMatrix() const {
-  return modelMatrix;
+  return objectData.modelMatrix;
 }
 
 geom::BoundBox Object3D::getBoundBox() const {

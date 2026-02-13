@@ -13,7 +13,6 @@ layout(std140) uniform FrameData {
      mat4   transform;
      vec4   viewPos;
 
-     int    hasTexture;
      float  textureColorLerpFactor;
      int    flatShading;
      int    grayscale;

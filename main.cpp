@@ -30,7 +30,7 @@ void addToDraw(Context & ctx, const std::string & name, const std::string & file
     TextureParser parser(ctx.texturesKeeper);
 
     parser.loadBMPFromFile( texture_path );
-    textures = &ctx.texturesKeeper->textures["texture"];
+    textures = &ctx.texturesKeeper->textures.begin()->second;
   }
 
   ctx.window->addObject3DToDraw(new Object3D(name, geometry, textures));

@@ -3,6 +3,7 @@
 
 layout(std140) uniform ObjectData {
     mat4 modelMatrix;
+    ivec4 objectFlags;
 } objData;
 
 layout(std140) uniform FrameData {
@@ -11,7 +12,6 @@ layout(std140) uniform FrameData {
      mat4   transform;
      vec4   viewPos;
 
-     int    hasTexture;
      float  textureColorLerpFactor;
      int   flatShading;
      int   grayscale;
@@ -53,7 +53,7 @@ void main() {
     vec3 fast_normal = fastNormal(fs_in.FragPos);
 
     vec3 triplanarTextureColor = vec3(0, 0, 0);
-    if (frameData.hasTexture > 0)
+    if (objData.objectFlags.x > 0)
         triplanarTextureColor = sampleTriplanar(fs_in.FragPos * 4.0, fast_normal);
 
     vec3 vertexColor = vec3(0);
@@ -65,7 +65,7 @@ void main() {
     
     vec3 resultColor = vec3(0);
 
-    if (frameData.hasTexture > 0)
+    if (objData.objectFlags.x > 0)
     {
         resultColor = mix(triplanarTextureColor, vertexColor, frameData.textureColorLerpFactor);
     }

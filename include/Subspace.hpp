@@ -10,6 +10,12 @@
 class Subspace
 {
   public:
+
+  Subspace(const glm42::mat4 & subspace_matrix,
+          const glm42::vec3& grid_color = glm42::vec3(0.5f, 0.5f, 0.5f),
+          int grid_from = -10, int grid_to = 10, int grid_step = 1)
+    : m_grid(grid_color, grid_from ,grid_to, grid_step), m_subspace_matrix(subspace_matrix) { }
+
   struct Grid
   {
     Grid(const glm42::vec3& color, int from = -10, int to = 10, int step = 1)
@@ -65,12 +71,6 @@ class Subspace
     }
   } m_basis;
 
-  Subspace(const glm42::mat4 & subspace_matrix,
-           const glm42::vec3& grid_color = glm42::vec3(0.5f, 0.5f, 0.5f),
-           int grid_from = -10, int grid_to = 10, int grid_step = 1)
-      : m_subspace_matrix(subspace_matrix), m_grid(grid_color, grid_from ,grid_to, grid_step) {
-
-  }
 
   void addObj(Object3D* obj)
   {
@@ -110,9 +110,9 @@ class Subspace
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
   }
 
+  glm42::mat4 m_subspace_matrix;
   std::vector<Object3D*> m_objects;
   std::vector<Debug3DLine*> m_lines;
-  glm42::mat4 m_subspace_matrix;
   mutable GLuint m_UBO = 0;
 
 private:
