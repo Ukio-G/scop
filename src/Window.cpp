@@ -23,9 +23,6 @@
 #include "include/Debug3DLine.hpp"
 #include "include/Subspace.hpp"
 
-#include <glm/mat4x4.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 
 Window::Window() : width( 0 ) , height( 0 ) {
 }
@@ -66,30 +63,6 @@ void Window::addObject3DToDraw(Object3D * object3d) {
 	objects3d.push_back(object3d);
 }
 
-void Window::draw3DObjects() {
-  shaderProgram->use();
-	for (auto & object3D: objects3d ) {
-		object3D->draw();
-	}
-}
-
-void helper_lines(std::vector<Debug3DLine> & lines)
-{
-  lines.emplace_back( glm42::vec3{0.0f, 0.0f, 0.0f}, glm42::vec3{1.0f, 0.0f, 0.0f}, glm42::vec3{1.0f, 0.0f, 0.0f} );
-  lines.emplace_back( glm42::vec3{0.0f, 0.0f, 0.0f}, glm42::vec3{0.0f, 1.0f, 0.0f}, glm42::vec3{0.0f, 1.0f, 0.0f} );
-  lines.emplace_back( glm42::vec3{0.0f, 0.0f, 0.0f}, glm42::vec3{0.0f, 0.0f, 1.0f}, glm42::vec3{0.0f, 0.0f, 1.0f} );
-
-  for(int z = -10; z < 10; z++)
-  {
-    lines.emplace_back(glm42::vec3{-10.0f, 0.0f, z}, glm42::vec3{10.0f, 0.0f, z}, glm42::vec3{.5f, .5f, .5f});
-  }
-
-  for(int x = -10; x < 10; x++)
-  {
-    lines.emplace_back(glm42::vec3{x, 0.0f, -10.f}, glm42::vec3{x, 0.0f, 10.f}, glm42::vec3{.5f, .5f, .5f});
-  }
-}
-
 void Window::drawLoop() {
   WireBBoxManager          wbox;
   TransformationBehaviours behaviours;
@@ -106,15 +79,13 @@ void Window::drawLoop() {
 
   auto id = glm42::mat4::id();
 
-  glm42::mat4 ss_scaled = glm42::scale(id, glm42::vec3{0.1, 0.1, 0.1});
-  glm42::mat4 ss_1 = glm42::translate(ss_scaled, glm42::vec3{15, 0, 0});
-  glm42::mat4 ss_2 = glm42::translate(ss_scaled, glm42::vec3{-15, 0, 0});
+  // glm42::mat4 ss_scaled = glm42::scale(id, glm42::vec3{1, 0.1, 0.1});
+  glm42::mat4 ss_1 = glm42::translate(id, glm42::vec3{15, 0, 0});
+  glm42::mat4 ss_2 = glm42::translate(id, glm42::vec3{-15, 0, 0});
 
-  Subspace gloal(id, glm42::vec3(0.5f, 0.5f, 0.5f));
   Subspace subspace(ss_1, glm42::vec3(0.f, 0.5f, 0.5f));
   Subspace subspace2(ss_2, glm42::vec3(0.2f, 0.7f, 0.9f));
 
-  gloal.initUBO(shadersControls);
   subspace.initUBO(shadersControls);
   subspace2.initUBO(shadersControls);
 
@@ -132,43 +103,6 @@ void Window::drawLoop() {
 
   bool show_fps    = (config_ptr->sections.contains("render_loop")) ? std::get<bool> (config_ptr->sections["render_loop"]["show_fps"]): false;
   bool draw_bounds = (config_ptr->sections.contains("render_loop")) ? std::get<bool> (config_ptr->sections["render_loop"]["draw_bounds"]): false;
-
-  std::vector<Debug3DLine> lines;
-  lines.reserve(10000);
-  helper_lines(lines);
-
-  EventChannel::getInstance().publish("NewKeyEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_P, [&](Window *) {
-    auto w = 1.0f;
-
-    auto emplacelines = [&](const glm42::mat4 & mtx, const glm42::vec3 & color, const glm42::vec3 & color2){
-      auto tl = mtx * glm42::vec4(-1.f, 1.f, -1.f, w);
-      auto tr = mtx * glm42::vec4(1.f, 1.f, -1.f, w);
-      auto bl = mtx * glm42::vec4(-1.f, -1.f, -1.f, w);
-      auto br = mtx * glm42::vec4(1.f, -1.f, -1.f, w);
-
-      auto tlf = mtx * glm42::vec4(-1.f, 1.f, 1.f, w * 2);
-      auto trf = mtx * glm42::vec4(1.f, 1.f, 1.f, w * 2);
-      auto blf = mtx * glm42::vec4(-1.f, -1.f, 1.f, w * 2);
-      auto brf = mtx * glm42::vec4(1.f, -1.f, 1.f, w * 2);
-
-      lines.emplace_back( tl.reduce(), tlf.reduce(), color2);
-      lines.emplace_back( tr.reduce(), trf.reduce(), color2);
-      lines.emplace_back( bl.reduce(), blf.reduce(), color2);
-      lines.emplace_back( br.reduce(), brf.reduce(), color2);
-
-      lines.emplace_back( tl.reduce(), tr.reduce(), color);
-      lines.emplace_back( tr.reduce(), br.reduce(), color);
-      lines.emplace_back( br.reduce(), bl.reduce(), color);
-      lines.emplace_back( bl.reduce(), tl.reduce(), color);
-
-      lines.emplace_back( tlf.reduce(), trf.reduce(), color);
-      lines.emplace_back( trf.reduce(), brf.reduce(), color);
-      lines.emplace_back( brf.reduce(), blf.reduce(), color);
-      lines.emplace_back( blf.reduce(), tlf.reduce(), color);
-    };
-
-    emplacelines(reverse( projectionMatrix ), {1.f, 1.f, 1.f}, {0.0, 0.0, 1.0});
-  }));
 
   for (auto& obj: objects3d)
   {
@@ -190,17 +124,17 @@ void Window::drawLoop() {
 
     shadersControls.update(*camera, projectionMatrix);
     
-    // if (!objects3d.empty() && draw_bounds)
-      // wbox.draw( **objControls.m_selectedObjectIt );
+    if (!objects3d.empty() && draw_bounds)
+      wbox.draw( **objControls.m_selectedObjectIt );
 
     if (show_fps)
       counter.frame();
 
-    gloal.draw( shadersControls );
     subspace.draw( shadersControls );
-    subspace2.draw( shadersControls );
-    draw3DObjects();
+    wbox.draw(**objControls.m_selectedObjectIt);
 
+    subspace2.draw( shadersControls );
+    wbox.draw(**objControls.m_selectedObjectIt);
 
     glfwSwapBuffers( glfwWindow );
     glfwPollEvents();

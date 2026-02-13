@@ -7,6 +7,10 @@ uniform ObjectData{
     mat4 modelMatrix;
 } objData;
 
+layout(std140) uniform SubspaceData {
+    mat4 subspaceMatrix;
+} subspaceData;
+
 layout(std140) uniform FrameData {
      mat4   projection;
      mat4   view;
@@ -24,6 +28,6 @@ out vec3 Color;
 uniform mat4 uBboxScale;                   // матрица модели объекта
 
 void main() {
-    gl_Position = frameData.projection * frameData.view * objData.modelMatrix * uBboxScale * vec4(aPos, 1.0);
+    gl_Position = frameData.projection * frameData.view * subspaceData.subspaceMatrix * objData.modelMatrix * uBboxScale * vec4(aPos, 1.0);
     Color = aColor;
 }

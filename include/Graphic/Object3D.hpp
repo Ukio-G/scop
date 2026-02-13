@@ -57,8 +57,6 @@ private:
   glm42::mat4 scaleMatrix     = glm42::mat4::id();
 	glm42::mat4 modelMatrix     = glm42::mat4::id();
 
-  float textureColorLerpFactor = 0.f;
-
   bool dirtyTransform = false;
 };
 

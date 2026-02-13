@@ -96,12 +96,14 @@ class Subspace
     shaders.useLineShaders();
     m_grid.draw();
     m_basis.draw();
-    for (const auto& line : m_lines) {
+    for (const auto& line : m_lines)
+    {
       line->draw();
     }
 
     shaders.useObjectsShader();
-    for (const auto& obj : m_objects) {
+    for (const auto& obj : m_objects)
+    {
       obj->draw();
     }
 

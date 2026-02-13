@@ -21,8 +21,9 @@ void ObjectsControls::initControls() {
         m_behaviours.removeBehaviourFromObject(*m_selectedObjectIt);
     }));
 
-
     eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_LEFT, [this](Window *) {
+      if (m_objects3d.empty())
+        return;
       if (m_selectedObjectIt == m_objects3d.begin()) {
         m_selectedObjectIt = m_objects3d.end() - 1;
       } else {
@@ -31,6 +32,8 @@ void ObjectsControls::initControls() {
     }));
 
     eventChannel.publish("NewKeyReleaseEvent", std::make_pair<int, std::function<void(Window * window)>>(GLFW_KEY_RIGHT, [this](Window *) {
+      if (m_objects3d.empty())
+        return;
       m_selectedObjectIt++;
       if (m_selectedObjectIt == m_objects3d.end())
         m_selectedObjectIt = m_objects3d.begin();

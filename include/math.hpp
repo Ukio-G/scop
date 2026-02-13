@@ -4,7 +4,6 @@
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
-#include <glm/ext/matrix_float4x4.hpp>
 #include <iostream>
 #include <optional>
 #include <ostream>
@@ -589,30 +588,6 @@ namespace glm42 {
   };
 
   }
-
-inline glm42::mat4 to_my_mat(const glm::mat4& gmat) {
-  glm42::mat4 result;
-  for (int col = 0; col < 4; ++col)
-    for (int row = 0; row < 4; ++row)
-      result.data[col][row] = gmat[col][row];
-  return result;
-}
-
-
-inline glm::mat4 to_glm_mat(const glm42::mat4& gmat) {
-  glm::mat4 result;
-  for (int col = 0; col < 4; ++col)
-    for (int row = 0; row < 4; ++row)
-      result[col][row] = gmat.data[col][row];
-  return result;
-}
-
-inline glm42::mat4 reverse(const glm42::mat4 mat)
-{
-  auto gmat = glm::inverse( to_glm_mat( mat ) );
-
-  return to_my_mat( gmat );
-}
 
 
 #endif

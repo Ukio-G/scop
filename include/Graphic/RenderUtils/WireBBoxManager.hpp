@@ -58,9 +58,16 @@ public:
     else
       glUniformBlockBinding(m_shaderProgram->shaderProgram, objDataIdx, (GLuint) ShaderProgram::BindingPoint::ObjectData);
 
+    unsigned int subspaceDataIdx = glGetUniformBlockIndex(m_shaderProgram->shaderProgram, "SubspaceData");
+    if (subspaceDataIdx == GL_INVALID_INDEX)
+      std::cerr << "ERROR: SubspaceData block not found in bbox program\n";
+    else
+      glUniformBlockBinding(m_shaderProgram->shaderProgram, subspaceDataIdx, (GLuint) ShaderProgram::BindingPoint::SubspaceData);
+
     // User-defined binding point number and just generated buffer with glGenBuffers(...)
     glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)ShaderProgram::BindingPoint::ObjectData, m_objectUBO);
     glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)ShaderProgram::BindingPoint::FrameData, m_frameUBO);
+    glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)ShaderProgram::BindingPoint::SubspaceData, m_subspaceUBO);
 
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
   }
@@ -113,5 +120,6 @@ private:
   GLuint                           m_VAO = 0, m_VBO = 0, m_EBO = 0;
   GLuint                           m_objectUBO = 0;
   GLuint                           m_frameUBO = 0;
+  GLuint                           m_subspaceUBO = 0;
   std::unique_ptr< ShaderProgram > m_shaderProgram;
 };

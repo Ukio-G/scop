@@ -22,20 +22,6 @@ TextureParser::TextureParser(TexturesKeeper* textureKeeper) : textureKeeper(text
 TextureParser::~TextureParser() = default;
 
 void TextureParser::loadBMPFromFile(const std::string &fileName) {
-
-    struct PixelRGB {
-        char r = 0;
-        char g = 0;
-        char b = 0;
-    };
-
-    struct PixelRGBA {
-        char r = 0;
-        char g = 0;
-        char b = 0;
-        char a = 0;
-    };
-
     int width, height;
     size_t pixel_data_idx = 0;
 

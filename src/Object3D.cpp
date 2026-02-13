@@ -15,11 +15,7 @@ Object3D::Object3D( const Object3D& other ) {
 Object3D::Object3D( const std::string& name, Geometry geometry, TexturesPack* textures )
     : name( name )
     , geometry( geometry )
-    , textures( textures )
-{
-  textureColorLerpFactor = 0.5f;
-
-}
+    , textures( textures ) { }
 
 Object3D& Object3D::operator=( const Object3D& other )
 {
@@ -29,7 +25,6 @@ Object3D& Object3D::operator=( const Object3D& other )
   name                   = other.name;
   geometry               = other.geometry;
   textures               = other.textures;
-  textureColorLerpFactor = other.textureColorLerpFactor;
 
   setTranslate( other.translateVector );
   setScale( other.scaleVector );
@@ -57,6 +52,8 @@ void Object3D::bindToDraw() const {
   }
 
   glBindVertexArray( geometry.buffers.VAO );
+  // ObjectData binding point is shared; force it to this object's UBO before draw.
+  glBindBufferBase(GL_UNIFORM_BUFFER, (GLuint)ShaderProgram::BindingPoint::ObjectData, UBO);
   
   glBindBuffer(GL_UNIFORM_BUFFER, UBO);
   glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm42::mat4), &(this->modelMatrix));
